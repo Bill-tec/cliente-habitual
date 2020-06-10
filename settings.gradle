@@ -1,0 +1,2 @@
+rootProject.name='Cliente Habitual'
+include ':app'
