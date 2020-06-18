@@ -5,18 +5,20 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
-public class BancoDeDados {
+import com.br.clientehabitual.models.Cliente;
+
+public class ClienteDAO {
     private SQLiteDatabase banco;
     private GerenciarBanco gerenciarBanco;
 
-    public BancoDeDados(Context context){
+    public ClienteDAO(Context context){
         gerenciarBanco = new GerenciarBanco(context);
     }
-    public boolean cadastrarCliente(String nome, String email){
+    public boolean cadastrarCliente(Cliente cliente){
         banco = gerenciarBanco.getWritableDatabase();
         ContentValues valores = new ContentValues();
-        valores.put("nome", nome);
-        valores.put("email", email);
+        valores.put("nome", cliente.getNome());
+        valores.put("email", cliente.getEmail());
         long resultado = banco.insert("clientes", null, valores);
         banco.close();
         return resultado > 0;

@@ -8,7 +8,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.br.clientehabitual.banco.BancoDeDados;
+import com.br.clientehabitual.banco.ClienteDAO;
+import com.br.clientehabitual.models.Cliente;
 
 public class cadastro_clientes extends AppCompatActivity {
     Button btnCadastrar;
@@ -18,10 +19,13 @@ public class cadastro_clientes extends AppCompatActivity {
         setContentView(R.layout.activity_cadastro_clientes);
     }
     public void cadastrarCliente(View v) {
-        BancoDeDados bancoDeDados= new BancoDeDados(getBaseContext());
+        ClienteDAO clienteDAO = new ClienteDAO(getBaseContext());
         EditText nome = (EditText)findViewById(R.id.txtNome);
         EditText email =(EditText)findViewById(R.id.txtEmail);
-        boolean resultado = bancoDeDados.cadastrarCliente(nome.getText().toString(), email.getText().toString());
+        Cliente cliente = new Cliente();
+        cliente.setNome(nome.getText().toString().trim());
+        cliente.setEmail(email.getText().toString().trim());
+        boolean resultado = clienteDAO.cadastrarCliente(cliente);
         if (resultado) {
             Toast.makeText(getApplicationContext(), "Cliente cadastrado com sucesso!",
                     Toast.LENGTH_LONG).show();
