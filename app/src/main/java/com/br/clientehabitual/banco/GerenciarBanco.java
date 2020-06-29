@@ -12,12 +12,12 @@ public class GerenciarBanco extends SQLiteOpenHelper {
     }
     @Override
     public void onCreate(SQLiteDatabase db){
-        String sql="CREATE TABLE clientes (_id integer primary key autoincrement, nome text, " +
+        String sql="CREATE TABLE clientes(id integer primary key autoincrement, nome text, " +
                 "email text)";
         db.execSQL(sql);
     }
     @Override
     public void onUpgrade(SQLiteDatabase db,int oldVersion,int newVersion){
-        db.execSQL("DROP TABLE IF EXISTS anotacoes");
+        db.execSQL("DROP TABLE IF EXISTS clientes");
         onCreate(db);
     }}

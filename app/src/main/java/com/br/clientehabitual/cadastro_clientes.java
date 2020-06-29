@@ -12,6 +12,7 @@ import com.br.clientehabitual.banco.ClienteDAO;
 import com.br.clientehabitual.models.Cliente;
 
 public class cadastro_clientes extends AppCompatActivity {
+    private EditText nome, email;
     Button btnCadastrar;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -20,18 +21,10 @@ public class cadastro_clientes extends AppCompatActivity {
     }
     public void cadastrarCliente(View v) {
         ClienteDAO clienteDAO = new ClienteDAO(getBaseContext());
-        EditText nome = (EditText)findViewById(R.id.txtNome);
-        EditText email =(EditText)findViewById(R.id.txtEmail);
-        Cliente cliente = new Cliente();
-        cliente.setNome(nome.getText().toString().trim());
-        cliente.setEmail(email.getText().toString().trim());
-        boolean resultado = clienteDAO.cadastrarCliente(cliente);
-        if (resultado) {
-            Toast.makeText(getApplicationContext(), "Cliente cadastrado com sucesso!",
-                    Toast.LENGTH_LONG).show();
-        } else {
-            Toast.makeText(getApplicationContext(), "Erro tente novamente!",
-                    Toast.LENGTH_LONG).show();
-        }
+        nome = (EditText)findViewById(R.id.txtNome);
+        email =(EditText)findViewById(R.id.txtEmail);
+        Cliente cliente = new Cliente(0,nome.getText().toString().trim(),
+                email.getText().toString().trim());
+        clienteDAO.cadastrarCliente(cliente);
     }
 }
