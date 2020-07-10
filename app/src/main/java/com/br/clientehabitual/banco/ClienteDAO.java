@@ -19,13 +19,14 @@ public class ClienteDAO {
     public ClienteDAO(Context context){
         gerenciarBanco = new GerenciarBanco(context);
     }
-    public void cadastrarCliente(Cliente cliente){
+    public boolean cadastrarCliente(Cliente cliente){
         banco = gerenciarBanco.getWritableDatabase();
-        ContentValues valores = new ContentValues();
-        valores.put(campos[1], cliente.getNome());
-        valores.put(campos[2], cliente.getEmail());
-        banco.insert(nomeTabela, null, valores);
+        ContentValues dados = new ContentValues();
+        dados.put(campos[1], cliente.getNome());
+        dados.put(campos[2], cliente.getEmail());
+        long result = banco.insert(nomeTabela, null, dados);
         banco.close();
+        return result > 0;
     }
     public List<Cliente> listaClientes(){
         List<Cliente> clientes = new ArrayList<>();
@@ -36,6 +37,7 @@ public class ClienteDAO {
                     cursor.getString(1),cursor.getString(2));
             clientes.add(c);
         };
+        cursor.close();
         db.close();
         return clientes;
     }
@@ -43,12 +45,8 @@ public class ClienteDAO {
         String where = campos[0]+ " = " + cliente.getId();
         SQLiteDatabase db = gerenciarBanco.getReadableDatabase();
         Cursor cursor = db.query(nomeTabela, campos, where, null, null, null, "nome ASC");
-        if (cursor != null) {
-            cliente = new Cliente(cursor.getInt(0),
-                    cursor.getString(1), cursor.getString(2));
-        }else{
-            cliente = null;
-        }
+        cliente = new Cliente(cursor.getInt(0),
+                cursor.getString(1), cursor.getString(2));
         db.close();
         return cliente;
     }
@@ -58,11 +56,26 @@ public class ClienteDAO {
         SQLiteDatabase db = gerenciarBanco.getReadableDatabase();
         Cursor cursor = db.query(nomeTabela, campos, where, null, null, null, "id ASC");
         while(cursor.moveToNext()){
-            Cliente c = new Cliente(cursor.getInt(0),
+            cliente = new Cliente(cursor.getInt(0),
                     cursor.getString(1),cursor.getString(2));
-            clientes.add(c);
+            clientes.add(cliente);
         };
         db.close();
         return clientes;
+    }
+    public void atualizarCliente(Cliente cliente){
+        SQLiteDatabase db = gerenciarBanco.getReadableDatabase();
+        String where = campos[0] + " =" + cliente.getId();
+        ContentValues dados = new ContentValues();
+        dados.put(campos[1], cliente.getNome());
+        dados.put(campos[2], cliente.getEmail());
+        db.update(nomeTabela, dados, where,null);
+        db.close();
+    }
+    public void deleteCliente(Cliente cliente) {
+        SQLiteDatabase db = gerenciarBanco.getReadableDatabase();
+        String where = campos[0] +"= "+cliente.getId();
+        db.delete(nomeTabela, where,null);
+        db.close();
     }
 }
