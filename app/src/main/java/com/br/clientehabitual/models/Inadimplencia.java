@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 
 public class Inadimplencia {
-    private int id;
+    private long id;
     private Calendar dataInicio;
     private Calendar dataFim;
     private Cliente cliente;
@@ -12,7 +12,7 @@ public class Inadimplencia {
     private ArrayList<Produto> produtos;
     private float total;
 
-    public Inadimplencia(int id, Calendar dataInicio, Calendar dataFim, Cliente cliente, boolean quitada, ArrayList<Produto> produtos) {
+    public Inadimplencia(long id, Calendar dataInicio, Calendar dataFim, Cliente cliente, boolean quitada, ArrayList<Produto> produtos) {
         this.id = id;
         this.dataInicio = dataInicio;
         this.dataFim = dataFim;
@@ -21,11 +21,11 @@ public class Inadimplencia {
         this.produtos = produtos;
     }
 
-    public int getId() {
+    public long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(long id) {
         this.id = id;
     }
 
@@ -67,5 +67,13 @@ public class Inadimplencia {
 
     public void setProdutos(ArrayList<Produto> produtos) {
         this.produtos = produtos;
+    }
+
+    public float getTotal() {
+        return total;
+    }
+
+    public void setTotal(float total) {
+        this.total = total;
     }
 }
