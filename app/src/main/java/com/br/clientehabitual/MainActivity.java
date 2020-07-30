@@ -9,7 +9,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.br.clientehabitual.banco.ClienteDAO;
+import com.br.clientehabitual.banco.daos.ClienteDAO;
 import com.br.clientehabitual.models.Cliente;
 
 import java.util.List;

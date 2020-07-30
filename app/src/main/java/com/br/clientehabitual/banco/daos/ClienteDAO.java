@@ -1,10 +1,11 @@
-package com.br.clientehabitual.banco;
+package com.br.clientehabitual.banco.daos;
 
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
+import com.br.clientehabitual.banco.GerenciarBanco;
 import com.br.clientehabitual.models.Cliente;
 
 import java.util.ArrayList;

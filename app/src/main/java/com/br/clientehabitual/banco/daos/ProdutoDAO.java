@@ -1,10 +1,11 @@
-package com.br.clientehabitual.banco;
+package com.br.clientehabitual.banco.daos;
 
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
+import com.br.clientehabitual.banco.GerenciarBanco;
 import com.br.clientehabitual.models.Inadimplencia;
 import com.br.clientehabitual.models.Produto;
 
@@ -51,12 +52,6 @@ public class ProdutoDAO implements Serializable {
     public void deleteProdutoId(Produto produto){
         SQLiteDatabase db = gerenciarBanco.getReadableDatabase();
         String where = camposTodos[0]+" = "+ produto.getId();
-        db.delete(nomeTabela,where,null);
-        db.close();
-    }
-    public void deleteAllProdutoInadimplencia(Inadimplencia inad){
-        SQLiteDatabase db = gerenciarBanco.getReadableDatabase();
-        String where = camposTodos[1]+" = "+ inad.getId();
         db.delete(nomeTabela,where,null);
         db.close();
     }

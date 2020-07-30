@@ -6,9 +6,8 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.Toast;
 
-import com.br.clientehabitual.banco.ClienteDAO;
+import com.br.clientehabitual.banco.daos.ClienteDAO;
 import com.br.clientehabitual.models.Cliente;
 
 public class cadastro_clientes extends AppCompatActivity {
