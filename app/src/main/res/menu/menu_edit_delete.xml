@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/item_cliente"
+        android:title="Cliente"
+        app:showAsAction="never">
+        <menu>
+            <item
+                android:id="@+id/sub_cliente_editar"
+                android:title="Editar"/>
+            <item
+                android:id="@+id/sub_cliente_delete"
+                android:title="Remover"/>
+        </menu>
+    </item>
+    <item
+        android:id="@+id/item_menu_produtos"
+        android:title="Produtos"
+        app:showAsAction="never">
+        <menu>
+            <item
+                android:id="@+id/sub_produto_baixa"
+                android:title="Dar baixa">
+                <menu>
+                    <item
+                        android:id="@+id/baixa_parcial"
+                        android:title="Parcial"/>
+                    <item
+                        android:id="@+id/baixa_total"
+                        android:title="Total"/>
+                </menu>
+            </item>
+            <item
+                android:id="@+id/sub_delete_produtos"
+                android:title="Limpar"/>
+        </menu>
+    </item>
+</menu>

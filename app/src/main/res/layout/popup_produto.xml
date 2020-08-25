@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent">
+    <EditText
+        android:id="@+id/popup_produto_quantidade"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="1"
+        android:hint="QTD"
+        android:gravity="center"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentStart="true"
+        android:layout_margin="5sp"/>
+    <EditText
+        android:id="@+id/popup_produto_nome"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Produto..."
+        android:layout_alignTop="@id/popup_produto_quantidade"
+        android:layout_toRightOf="@id/popup_produto_quantidade"
+        android:layout_toLeftOf="@id/popup_produto_preco"/>
+    <EditText
+        android:id="@+id/popup_produto_preco"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:hint="00.00"
+        android:layout_toLeftOf="@id/label_sifrao"
+        android:layout_alignTop="@id/popup_produto_quantidade"
+        android:layout_marginLeft="5sp"/>
+    <TextView
+        android:id="@+id/label_sifrao"
+        android:text="R$"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_alignBottom="@id/popup_produto_quantidade"
+        android:layout_alignTop="@id/popup_produto_quantidade"
+        android:gravity="center"
+        android:layout_marginEnd="5sp"/>
+    <Button
+        android:id="@+id/popup_produto_btn_remover"
+        android:text="Deletar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_below="@id/popup_produto_quantidade"
+        android:layout_margin="5sp"/>
+    <Button
+        android:id="@+id/popup_produto_btn_atualizar"
+        android:text="Atualizar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toLeftOf="@id/popup_produto_btn_remover"
+        android:layout_alignTop="@id/popup_produto_btn_remover"
+        android:layout_marginRight="5sp" />
+    <TextView
+        android:id="@+id/popup_total"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@id/popup_produto_btn_remover"
+        android:layout_alignBottom="@id/popup_produto_btn_atualizar"
+        android:layout_toLeftOf="@id/popup_produto_btn_atualizar"
+        android:layout_alignParentStart="true"
+        android:gravity="center"/>
+
+
+</RelativeLayout>

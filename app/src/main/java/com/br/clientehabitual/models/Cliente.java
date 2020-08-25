@@ -1,5 +1,7 @@
 package com.br.clientehabitual.models;
 
+import androidx.annotation.NonNull;
+
 public class Cliente {
     private int id;
     private  String nome;
@@ -33,5 +35,11 @@ public class Cliente {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    @NonNull
+    @Override
+    public String toString() {
+        return nome;
     }
 }

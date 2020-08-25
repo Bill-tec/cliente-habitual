@@ -12,13 +12,12 @@ public class Inadimplencia {
     private ArrayList<Produto> produtos;
     private float total;
 
-    public Inadimplencia(long id, Calendar dataInicio, Calendar dataFim, Cliente cliente, boolean quitada, ArrayList<Produto> produtos) {
+    public Inadimplencia(long id, Calendar dataInicio, Calendar dataFim, Cliente cliente, boolean quitada) {
         this.id = id;
         this.dataInicio = dataInicio;
         this.dataFim = dataFim;
         this.cliente = cliente;
         this.quitada = quitada;
-        this.produtos = produtos;
     }
 
     public long getId() {

@@ -9,10 +9,9 @@ import com.br.clientehabitual.banco.GerenciarBanco;
 import com.br.clientehabitual.models.Inadimplencia;
 import com.br.clientehabitual.models.Produto;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 
-public class ProdutoDAO implements Serializable {
+public class ProdutoDAO{
     private SQLiteDatabase banco;
     private GerenciarBanco gerenciarBanco;
     private static final String[] camposTodos = {"id","inadimplenciaId", "nome", "preco","quantidade"};
@@ -21,33 +20,29 @@ public class ProdutoDAO implements Serializable {
     public ProdutoDAO(Context context){
         gerenciarBanco = new GerenciarBanco(context);
     }
-    public void addProdutos(Inadimplencia inadimplencia){
-        ArrayList<Produto> produtos = inadimplencia.getProdutos();
+    public void addProduto(long idInadimplencia, Produto produto){
         banco = gerenciarBanco.getWritableDatabase();
-        for (Produto p:produtos) {
-            ContentValues dados = new ContentValues();
-            dados.put(camposTodos[1], inadimplencia.getId());
-            dados.put(camposTodos[2], p.getNome());
-            dados.put(camposTodos[3], p.getPreco());
-            dados.put(camposTodos[4], p.getQuantidade());
-            banco.insert(nomeTabela,null, dados);
-        }
+        ContentValues dados = new ContentValues();
+        dados.put(camposTodos[1], idInadimplencia);
+        dados.put(camposTodos[2], produto.getNome());
+        dados.put(camposTodos[3], produto.getPreco());
+        dados.put(camposTodos[4], produto.getQuantidade());
+        banco.insert(nomeTabela,null, dados);
         banco.close();
     }
-    public Inadimplencia listProdutosInad(Inadimplencia inad){
+    public ArrayList<Produto> listProdutosInad(Inadimplencia inad){
         ArrayList<Produto> produtos = new ArrayList<>();
         String where = camposTodos[1] +" = "+ inad.getId();
         String[] campos = {"id", "nome", "preco","quantidade"};
         SQLiteDatabase db = gerenciarBanco.getReadableDatabase();
         Cursor cursor = db.query(nomeTabela,campos,where,null,null,null,"id ASC");
-        db.close();
         while (cursor.moveToNext()){
             Produto p = new Produto(cursor.getInt(0),cursor.getString(1),
                     cursor.getFloat(2),cursor.getInt(3));
             produtos.add(p);
         }
-        inad.setProdutos(produtos);
-        return inad;
+        db.close();
+        return produtos;
     }
     public void deleteProdutoId(Produto produto){
         SQLiteDatabase db = gerenciarBanco.getReadableDatabase();

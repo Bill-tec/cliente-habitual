@@ -4,41 +4,22 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".MainActivity">
-    <TextView
-        android:id="@+id/inicio"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Tela Inicial!"
-        android:layout_centerInParent="true"
-        android:layout_alignParentTop="true"
-        android:textSize="35dp"
-        />
     <EditText
-        android:id="@+id/id"
+        android:id="@+id/mainPesquisa"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/inicio"
-        android:hint="ID"
-        android:layout_margin="5dp"/>
-    <Button
-        android:id="@+id/delete"
+        android:hint="Pesquise seu cliente..."
+        android:layout_margin="5dp"
+        android:inputType="textFilter"/>
+    <ListView
+        android:id="@+id/mainLista"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Delete"
-        android:layout_below="@id/id"/>
-    <Button
-        android:id="@+id/atualizar"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Atualizar"
-        android:layout_alignTop="@id/delete"
-        android:layout_toRightOf="@id/delete"/>
-
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Cadastro de Cliente"
-        android:layout_centerInParent="true"
-        android:onClick="cadastroCliente"/>
+        android:layout_below="@+id/mainPesquisa"
+        android:scrollbars="vertical"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
+        android:layout_margin="8sp"/>
 
 </RelativeLayout>

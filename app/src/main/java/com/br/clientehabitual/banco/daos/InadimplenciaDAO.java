@@ -10,14 +10,12 @@ import com.br.clientehabitual.models.Cliente;
 import com.br.clientehabitual.models.Inadimplencia;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.List;
 
 public class InadimplenciaDAO {
     private SQLiteDatabase banco;
     private GerenciarBanco gerenciarBanco;
-    private static final String[] campos = {"id", "dataCriacao", "dataBaixa", "clienteId", "situacao"};
+    private static final String[] campos = {"id", "dataInicio", "dataFim", "clienteId", "quitada"};
     private static final String nomeTabela = "inadimplencias";
 
     public InadimplenciaDAO(Context context) {
@@ -36,41 +34,19 @@ public class InadimplenciaDAO {
         } catch (Exception e){}
         return inadimplencia;
     }
-    /*listInadimplecias !!!! PROVAVELMENTE NÃO SERA USADA*/
-    public List<Inadimplencia> listInadimplecias(){
+    public Inadimplencia getInadimpleciaCliente(Cliente cliente){
         Inadimplencia inadimplencia = null;
-        List<Inadimplencia> inadimplencias = new ArrayList<>();
-        SQLiteDatabase db = gerenciarBanco.getReadableDatabase();
-        Cursor cursor = db.query(nomeTabela, campos,null, null,null,null,null);
-        while (cursor.moveToNext()) {
-            Cliente cliente = new Cliente(cursor.getInt(3), "", "");
-            inadimplencia.setCliente(cliente);
-            inadimplencia.setDataInicio(stringToCalendar(cursor.getString(1)));
-            if (cursor.getString(2).length() > 0) {
-                inadimplencia.setDataFim(stringToCalendar(cursor.getString(2)));
-            }
-            inadimplencia.setId(cursor.getInt(0));
-            inadimplencia.setQuitada(Boolean.getBoolean(cursor.getString(4)));
-            inadimplencias.add(inadimplencia);
-        }
-        return inadimplencias;
-    }public List<Inadimplencia> listInadimpleciasCliente(Cliente cliente){
-        Inadimplencia inadimplencia = null;
-        List<Inadimplencia> inadimplencias = new ArrayList<>();
         SQLiteDatabase db = gerenciarBanco.getReadableDatabase();
         String where = campos[3] + " = "+cliente.getId();
         Cursor cursor = db.query(nomeTabela, campos,where, null,null,null,null);
-        while (cursor.moveToNext()) {
-            inadimplencia.setCliente(cliente);
-            inadimplencia.setDataInicio(stringToCalendar(cursor.getString(1)));
-            if (cursor.getString(2).length() > 0) {
+        if (cursor.moveToNext()) {
+            inadimplencia = new Inadimplencia(cursor.getLong(0),stringToCalendar(cursor.getString(1)) ,null
+                    ,cliente,Boolean.getBoolean(cursor.getString(4)));
+            if (cursor.getString(2) != null) {
                 inadimplencia.setDataFim(stringToCalendar(cursor.getString(2)));
             }
-            inadimplencia.setId(cursor.getInt(0));
-            inadimplencia.setQuitada(Boolean.getBoolean(cursor.getString(4)));
-            inadimplencias.add(inadimplencia);
         }
-        return inadimplencias;
+        return inadimplencia;
     }
     public void quitInadimplencia(Inadimplencia inad){
         SQLiteDatabase db = gerenciarBanco.getReadableDatabase();
