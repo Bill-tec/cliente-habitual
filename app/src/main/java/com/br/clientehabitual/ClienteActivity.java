@@ -7,6 +7,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -26,19 +28,21 @@ import com.br.clientehabitual.banco.daos.ProdutoDAO;
 import com.br.clientehabitual.models.Cliente;
 import com.br.clientehabitual.models.Inadimplencia;
 import com.br.clientehabitual.models.Produto;
+import com.br.clientehabitual.util.Conversoes;
 
 import java.text.DecimalFormat;
 import java.util.Calendar;
 
 public class ClienteActivity extends AppCompatActivity {
-    private EditText nome, email,preco, quantidade;
+    private EditText nome, email,preco, quantidade, date;
     private Button adicionar, limpar;
-    private TextView total;
+    private TextView total, dataInicio,textViewdataPagamento;
     private Cliente cliente;
     private ClienteDAO clienteDAO = new ClienteDAO(this);
     private ProdutoDAO produtoDAO = new ProdutoDAO(this);
     private Inadimplencia inadimplencia;
     private InadimplenciaDAO inadimplenciaDAO = new InadimplenciaDAO(this);
+    private Conversoes converter = new Conversoes();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -51,16 +55,31 @@ public class ClienteActivity extends AppCompatActivity {
         setTitle(cliente.getNome());
 
         inadimplencia = inadimplenciaDAO.getInadimpleciaCliente(cliente);
+        if (inadimplencia != null) {
+            if (inadimplencia.getDataFim() != null){
+                textViewdataPagamento = (TextView)findViewById(R.id.data_pagamento);
+                textViewdataPagamento.setText(converter.calendarToString(inadimplencia.getDataFim()).replaceAll("-","/"));
+            }
+        }
         gerarListaProdutos();
 
-        quantidade = (EditText)findViewById(R.id.produto_quantidade);
-        nome = (EditText) findViewById(R.id.produto_nome);
-        preco = (EditText) findViewById(R.id.produto_preco);
+        textViewdataPagamento = (TextView) findViewById(R.id.data_pagamento);
+        textViewdataPagamento.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dataPagamentoPopUp();
+            }
+        });
 
         adicionar = findViewById(R.id.btn_add);
         adicionar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+                quantidade = (EditText)findViewById(R.id.produto_quantidade);
+                nome = (EditText) findViewById(R.id.produto_nome);
+                preco = (EditText) findViewById(R.id.produto_preco);
+
                 Produto produto = new Produto(0, nome.getText().toString().trim(),
                         Float.parseFloat(preco.getText().toString().trim()),
                         Integer.parseInt(quantidade.getText().toString().trim()));
@@ -72,8 +91,14 @@ public class ClienteActivity extends AppCompatActivity {
                          Calendar data = Calendar.getInstance();
                          inadimplencia = new Inadimplencia(0,data, null,cliente, false);
                          inadimplencia = inadimplenciaDAO.newInadimplencia(inadimplencia);
+                     } else if (inadimplencia.getProdutos().isEmpty()){
+                         inadimplenciaDAO.deleteInadimplencia(inadimplencia);
+                         Calendar data = Calendar.getInstance();
+                         inadimplencia = new Inadimplencia(0,data, null,cliente, false);
+                         inadimplencia = inadimplenciaDAO.newInadimplencia(inadimplencia);
                      }
-                    produtoDAO.addProduto(inadimplencia.getId(),produto);
+                     produtoDAO.addProduto(inadimplencia.getId(),produto);
+                     gerarListaProdutos();
                 }
             }
         });
@@ -82,6 +107,10 @@ public class ClienteActivity extends AppCompatActivity {
         limpar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                quantidade = (EditText)findViewById(R.id.produto_quantidade);
+                nome = (EditText) findViewById(R.id.produto_nome);
+                preco = (EditText) findViewById(R.id.produto_preco);
+
                 quantidade.setText("1");
                 nome.setText("");
                 preco.setText("");
@@ -151,8 +180,12 @@ public class ClienteActivity extends AppCompatActivity {
         });
     }
     public void gerarListaProdutos(){
-        ListView lista = findViewById(R.id.lst_produtos);
         if (inadimplencia != null){
+            ListView lista = findViewById(R.id.lst_produtos);
+
+            dataInicio = (TextView) findViewById(R.id.data_incio);
+            dataInicio.setText(converter.calendarToString(inadimplencia.getDataInicio()).replaceAll("-","/"));
+
             inadimplencia.setProdutos(produtoDAO.listProdutosInad(inadimplencia));
             ArrayAdapter adapter = new ProdutoAdapter(this,inadimplencia.getProdutos());
             lista.setAdapter(adapter);
@@ -182,6 +215,7 @@ public class ClienteActivity extends AppCompatActivity {
         final  View popupProdutoView = getLayoutInflater().inflate(R.layout.popup_produto,null);
         dialogBuilder.setView(popupProdutoView);
         dialog = dialogBuilder.create();
+        dialog.setTitle("Editar Produto");
         dialog.show();
         DecimalFormat df = new DecimalFormat("#.00");
 
@@ -222,7 +256,7 @@ public class ClienteActivity extends AppCompatActivity {
         remover.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                confirmDeleteProduto(produto);
+                confirmDeleteProduto(produto,dialog);
             }
         });
     }
@@ -246,8 +280,7 @@ public class ClienteActivity extends AppCompatActivity {
                     }
                 }).show();
     }
-
-    public void confirmDeleteProduto(final Produto produto){
+    public void confirmDeleteProduto(final Produto produto, final AlertDialog dialogProduto){
         AlertDialog dialog = new AlertDialog.Builder(this)
                 .setMessage("Deseja remover: "+produto.getNome()+" ?")
                 .setPositiveButton("Sim", new DialogInterface.OnClickListener() {
@@ -255,8 +288,8 @@ public class ClienteActivity extends AppCompatActivity {
                     public void onClick(DialogInterface dialog, int which) {
                         produtoDAO.deleteProdutoId(produto);
                         Toast.makeText(getApplicationContext(),"Produto removido com sucesso!",Toast.LENGTH_SHORT).show();
-                        Intent intent = new Intent(ClienteActivity.this,MainActivity.class);
-                        startActivity(intent);
+                        gerarListaProdutos();
+                        dialogProduto.dismiss();
                     }
 
                 })
@@ -266,6 +299,89 @@ public class ClienteActivity extends AppCompatActivity {
                         dialog.dismiss();
                     }
                 }).show();
+    }
+    public void dataPagamentoPopUp(){
+        AlertDialog.Builder dialogBuilder;
+        final AlertDialog dialog;
+        dialogBuilder = new AlertDialog.Builder(this);
+        final  View popupDataView = getLayoutInflater().inflate(R.layout.popup_data,null);
+        dialogBuilder.setView(popupDataView);
+        dialog = dialogBuilder.create();
+        dialog.setTitle("Previsão para pagamento!");
+        dialog.show();
+
+        date = (EditText) popupDataView.findViewById(R.id.popup_data_edittext);
+        date.addTextChangedListener(new TextWatcher() {
+            String current = "";
+            String ddmmyyyy = "DDMMYYYY";
+            Calendar cal = Calendar.getInstance();
+
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (!s.toString().equals(current)) {
+                    String clean = s.toString().replaceAll("[^\\d.]|\\.", "");
+                    String cleanC = current.replaceAll("[^\\d.]|\\.", "");
+
+                    int cl = clean.length();
+                    int sel = cl;
+                    for (int i = 2; i <= cl && i < 6; i += 2) {
+                        sel++;
+                    }
+                    if (clean.equals(cleanC)) sel--;
+
+                    if (clean.length() < 8){
+                        clean = clean + ddmmyyyy.substring(clean.length());
+                    }else{
+                        int day  = Integer.parseInt(clean.substring(0,2));
+                        int mon  = Integer.parseInt(clean.substring(2,4));
+                        int year = Integer.parseInt(clean.substring(4,8));
+
+                        mon = mon < 1 ? 1 : mon > 12 ? 12 : mon;
+                        cal.set(Calendar.MONTH, mon-1);
+                        year = (year<1900)?1900:(year>2100)?2100:year;
+                        cal.set(Calendar.YEAR, year);
+
+                        day = (day > cal.getActualMaximum(Calendar.DATE))? cal.getActualMaximum(Calendar.DATE):day;
+                        clean = String.format("%02d%02d%02d",day, mon, year);
+                    }
+
+                    clean = String.format("%s/%s/%s", clean.substring(0, 2),
+                            clean.substring(2, 4),
+                            clean.substring(4, 8));
+
+                    sel = sel < 0 ? 0 : sel;
+                    current = clean;
+                    date.setText(current);
+                    date.setSelection(sel < current.length() ? sel : current.length());
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
+        final Button salvar = popupDataView.findViewById(R.id.btn_pupup_data_dalvar);
+        if (inadimplencia.getDataFim() != null){
+            date.setText(converter.calendarToString(inadimplencia.getDataFim()).replaceAll("-","/"));
+            salvar.setText("Atualizar");
+        }
+        salvar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                    Calendar calendar = converter.stringToCalendar(date.getText().toString().replaceAll("/","-"));
+                    inadimplencia.setDataFim(calendar);
+                    inadimplenciaDAO.setDataPagamentoInadimplencia(inadimplencia);
+                    Toast.makeText(getApplicationContext(),"Data salva com sucesso!",Toast.LENGTH_SHORT).show();
+                    textViewdataPagamento.setText(converter.calendarToString(inadimplencia.getDataFim()));
+                    dialog.dismiss();
+            }
+        });
     }
 
 }

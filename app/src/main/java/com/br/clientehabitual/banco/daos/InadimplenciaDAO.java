@@ -8,15 +8,15 @@ import android.database.sqlite.SQLiteDatabase;
 import com.br.clientehabitual.banco.GerenciarBanco;
 import com.br.clientehabitual.models.Cliente;
 import com.br.clientehabitual.models.Inadimplencia;
-
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
+import com.br.clientehabitual.util.Conversoes;
+;import java.util.Calendar;
 
 public class InadimplenciaDAO {
     private SQLiteDatabase banco;
     private GerenciarBanco gerenciarBanco;
     private static final String[] campos = {"id", "dataInicio", "dataFim", "clienteId", "quitada"};
     private static final String nomeTabela = "inadimplencias";
+    private Conversoes converter = new Conversoes();
 
     public InadimplenciaDAO(Context context) {
         gerenciarBanco = new GerenciarBanco(context);
@@ -26,7 +26,7 @@ public class InadimplenciaDAO {
         banco = gerenciarBanco.getWritableDatabase();
         try{
             ContentValues dados = new ContentValues();
-            dados.put(campos[1], calendarToString(inadimplencia.getDataInicio()));
+            dados.put(campos[1], converter.calendarToString(inadimplencia.getDataInicio()));
             dados.put(campos[3], cliente.getId());
             dados.put(campos[4], "false");
             inadimplencia.setId(banco.insert(nomeTabela,null,dados));
@@ -40,20 +40,19 @@ public class InadimplenciaDAO {
         String where = campos[3] + " = "+cliente.getId();
         Cursor cursor = db.query(nomeTabela, campos,where, null,null,null,null);
         if (cursor.moveToNext()) {
-            inadimplencia = new Inadimplencia(cursor.getLong(0),stringToCalendar(cursor.getString(1)) ,null
+            inadimplencia = new Inadimplencia(cursor.getLong(0),converter.stringToCalendar(cursor.getString(1)) ,null
                     ,cliente,Boolean.getBoolean(cursor.getString(4)));
             if (cursor.getString(2) != null) {
-                inadimplencia.setDataFim(stringToCalendar(cursor.getString(2)));
+                inadimplencia.setDataFim(converter.stringToCalendar(cursor.getString(2)));
             }
         }
         return inadimplencia;
     }
-    public void quitInadimplencia(Inadimplencia inad){
+    public void setDataPagamentoInadimplencia(Inadimplencia inad){
         SQLiteDatabase db = gerenciarBanco.getReadableDatabase();
         String where = campos[0] + " = "+ inad.getId();
         ContentValues dados = new ContentValues();
-        dados.put(campos[1], calendarToString(inad.getDataFim()));
-        dados.put(campos[4], Boolean.toString(inad.isQuitada()));
+        dados.put(campos[2], converter.calendarToString(inad.getDataFim()));
         db.update(nomeTabela,dados,where,null);
         db.close();
     }
@@ -63,21 +62,5 @@ public class InadimplenciaDAO {
         db.delete(nomeTabela, where, null);
         db.close();
     }
-    public String calendarToString(Calendar calendar){
-        String data = "";
-        calendar.getTime();
-        try {
-            SimpleDateFormat dataSimple = new SimpleDateFormat("dd-MM-yyyy");
-            data = dataSimple.format(calendar);
-        }catch (Exception e){}
-        return data;
-    }
-    public Calendar stringToCalendar(String dataString){
-        Calendar data = Calendar.getInstance();
-        SimpleDateFormat dataSimple = new SimpleDateFormat("dd-MM-yyyy");
-        try {
-            data.setTime(dataSimple.parse(dataString));
-        }catch (Exception e){}
-        return data;
-    }
+
 }

@@ -14,15 +14,18 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
         android:layout_alignParentStart="true"
-        android:layout_margin="5sp"/>
+        android:layout_margin="5sp"
+        android:inputType="numberDecimal"/>
     <EditText
         android:id="@+id/produto_nome"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="Produto..."
         android:layout_alignTop="@id/produto_quantidade"
+        android:layout_alignBottom="@+id/produto_quantidade"
         android:layout_toRightOf="@id/produto_quantidade"
-        android:layout_toLeftOf="@id/produto_preco"/>
+        android:layout_toLeftOf="@id/produto_preco"
+        android:inputType="text"/>
     <EditText
         android:id="@+id/produto_preco"
         android:layout_width="wrap_content"
@@ -30,7 +33,9 @@
         android:hint="00.00"
         android:layout_toLeftOf="@id/label_sifrao"
         android:layout_alignTop="@id/produto_quantidade"
-        android:layout_marginLeft="5sp"/>
+        android:layout_alignBottom="@+id/produto_quantidade"
+        android:layout_marginLeft="5sp"
+        android:inputType="numberDecimal"/>
     <TextView
         android:id="@+id/label_sifrao"
         android:text="R$"
@@ -54,7 +59,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_toLeftOf="@id/btn_add"
-        android:layout_alignTop="@id/btn_add" />
+        android:layout_alignTop="@id/btn_add"
+        android:layout_alignBottom="@id/btn_add"/>
     <TextView
         android:id="@+id/label_Total"
         android:layout_width="wrap_content"
@@ -91,15 +97,17 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
-        android:layout_alignParentBottom="true"/>
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="10sp"/>
 
-    <EditText
+    <TextView
         android:id="@+id/data_pagamento"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_toRightOf="@id/divisoria"
         android:layout_alignParentRight="true"
+        android:layout_alignTop="@id/divisoria"
         android:hint="Pagamento"
         android:gravity="center"
         />

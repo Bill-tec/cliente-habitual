@@ -28,6 +28,7 @@ public class ProdutoDAO{
         dados.put(camposTodos[3], produto.getPreco());
         dados.put(camposTodos[4], produto.getQuantidade());
         banco.insert(nomeTabela,null, dados);
+        dados.clear();
         banco.close();
     }
     public ArrayList<Produto> listProdutosInad(Inadimplencia inad){
@@ -41,6 +42,7 @@ public class ProdutoDAO{
                     cursor.getFloat(2),cursor.getInt(3));
             produtos.add(p);
         }
+        cursor.close();
         db.close();
         return produtos;
     }
@@ -58,6 +60,7 @@ public class ProdutoDAO{
         dados.put(camposTodos[3], produto.getPreco());
         dados.put(camposTodos[4], produto.getQuantidade());
         db.update(nomeTabela,dados,where,null);
+        dados.clear();
         db.close();
     }
 }
