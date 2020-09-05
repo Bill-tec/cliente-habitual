@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent">
+    <TextView
+        android:id="@+id/popup_edittext_pagamento_total"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="total"
+        android:layout_alignParentStart="true"
+        android:layout_toLeftOf="@id/valor"
+        android:layout_alignTop="@id/valor"
+        android:layout_alignBottom="@id/valor"
+        android:gravity="center"/>
+    <EditText
+        android:id="@+id/valor"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:inputType="numberDecimal"
+        android:hint="00.00"
+        android:layout_margin="10sp"
+        android:layout_toLeftOf="@id/sifrao"/>
+    <TextView
+        android:id="@+id/sifrao"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:inputType="numberDecimal"
+        android:layout_alignParentEnd="true"
+        android:text="R$"
+        android:layout_alignTop="@id/valor"
+        android:layout_alignBottom="@+id/valor"
+        android:gravity="center"/>
+    <TextView
+        android:id="@+id/resto"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignTop="@id/descontar"
+        android:layout_alignBottom="@+id/descontar"
+        android:layout_toLeftOf="@id/descontar"
+        android:gravity="center"/>
+    <Button
+        android:id="@+id/descontar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Descontar"
+        android:layout_alignParentEnd="true"
+        android:layout_below="@id/valor"
+        android:layout_margin="5sp"/>
+
+</RelativeLayout>

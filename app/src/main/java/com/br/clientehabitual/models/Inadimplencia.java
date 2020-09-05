@@ -75,4 +75,5 @@ public class Inadimplencia {
     public void setTotal(float total) {
         this.total = total;
     }
+
 }

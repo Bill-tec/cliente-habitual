@@ -16,7 +16,7 @@ public class GerenciarBanco extends SQLiteOpenHelper {
                 "email text)";
 
         String inadimpleciasSql="CREATE TABLE inadimplencias(id integer primary key autoincrement, dataInicio text, " +
-                "dataFim text, clienteId integer , quitada text, foreign key (clienteId) references clientes(id))";
+                "dataFim text, clienteId integer , quitada integer, total real, foreign key (clienteId) references clientes(id))";
 
         String produtosSql="CREATE TABLE produtos(id integer primary key autoincrement," +
                 "inadimplenciaId integer references inadimplencias(id),nome text, preco real, quantidade integer)";

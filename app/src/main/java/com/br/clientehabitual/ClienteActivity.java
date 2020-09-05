@@ -42,6 +42,8 @@ public class ClienteActivity extends AppCompatActivity {
     private ProdutoDAO produtoDAO = new ProdutoDAO(this);
     private Inadimplencia inadimplencia;
     private InadimplenciaDAO inadimplenciaDAO = new InadimplenciaDAO(this);
+    private DecimalFormat df = new DecimalFormat("#.00");
+
     private Conversoes converter = new Conversoes();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,6 +55,7 @@ public class ClienteActivity extends AppCompatActivity {
         cliente = new Cliente(id,"","");
         cliente = clienteDAO.getClienteId(cliente);
         setTitle(cliente.getNome());
+
 
         inadimplencia = inadimplenciaDAO.getInadimpleciaCliente(cliente);
         if (inadimplencia != null) {
@@ -84,20 +87,25 @@ public class ClienteActivity extends AppCompatActivity {
                         Float.parseFloat(preco.getText().toString().trim()),
                         Integer.parseInt(quantidade.getText().toString().trim()));
 
-                 if(produto.getNome().length() == 0 || produto.getQuantidade() <=0 || produto.getPreco() <= 0){
+                 if(produto.getQuantidade() <=0 || produto.getPreco() <= 0){
                     Toast.makeText(getApplicationContext(),"Erro, verifique os campos e tente novamente!",Toast.LENGTH_SHORT).show();
                 } else {
                      if (inadimplencia == null){
                          Calendar data = Calendar.getInstance();
                          inadimplencia = new Inadimplencia(0,data, null,cliente, false);
                          inadimplencia = inadimplenciaDAO.newInadimplencia(inadimplencia);
-                     } else if (inadimplencia.getProdutos().isEmpty()){
+                     } else if (inadimplencia.isQuitada() == true){
                          inadimplenciaDAO.deleteInadimplencia(inadimplencia);
                          Calendar data = Calendar.getInstance();
                          inadimplencia = new Inadimplencia(0,data, null,cliente, false);
                          inadimplencia = inadimplenciaDAO.newInadimplencia(inadimplencia);
                      }
+                     inadimplencia.setTotal(inadimplencia.getTotal() + (produto.getQuantidade() * produto.getPreco()));
+                     inadimplenciaDAO.setValorTotal(inadimplencia);
                      produtoDAO.addProduto(inadimplencia.getId(),produto);
+                     quantidade.setText("1");
+                     nome.setText("");
+                     preco.setText("");
                      gerarListaProdutos();
                 }
             }
@@ -132,12 +140,17 @@ public class ClienteActivity extends AppCompatActivity {
                 popupAtualizarCliente();
                 return true;
             case R.id.sub_cliente_delete:
-                inadimplencia = inadimplenciaDAO.getInadimpleciaCliente(cliente);
-                if (inadimplencia != null){
-                    Toast.makeText(getApplicationContext(),"Seu cliente ainda tem inadimplência ativa!",Toast.LENGTH_SHORT).show();
+                if (inadimplencia == null){
+                    confirmDeleteCliente();
+                }
+                else if (inadimplencia.isQuitada() == false){
+                    Toast.makeText(getApplicationContext(),"Seu cliente ainda tem inadimplência ativa!",Toast.LENGTH_LONG).show();
                 }else {
                     confirmDeleteCliente();
                 }
+                return true;
+            case R.id.inadimplencia_baixa:
+            popupBaixaInadimplencia();
                 return true;
         }
         return super.onOptionsItemSelected(item);
@@ -189,17 +202,8 @@ public class ClienteActivity extends AppCompatActivity {
             inadimplencia.setProdutos(produtoDAO.listProdutosInad(inadimplencia));
             ArrayAdapter adapter = new ProdutoAdapter(this,inadimplencia.getProdutos());
             lista.setAdapter(adapter);
-            TextView total = findViewById(R.id.label_Total);
-            double valorT = 0;
-            if (inadimplencia.getProdutos().isEmpty()){
-                total.setText("");
-            }else {
-                for (Produto p :inadimplencia.getProdutos()) {
-                    valorT = valorT + (p.getQuantidade() * p.getPreco());
-                }
-                DecimalFormat df = new DecimalFormat("#.00");
-                total.setText(df.format(valorT) + "R$");
-            }
+            total = findViewById(R.id.label_Total);
+            total.setText(df.format(inadimplencia.getTotal())+ "R$");
             lista.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -246,6 +250,9 @@ public class ClienteActivity extends AppCompatActivity {
                 } else {
                     dialog.dismiss();
                     produtoDAO.updateProduto(produtoEdit);
+                    inadimplencia.setTotal(inadimplencia.getTotal() + ((produto.getQuantidade() * produto.getPreco())
+                        - (produtoEdit.getQuantidade() * produtoEdit.getPreco())));
+                    inadimplenciaDAO.setValorTotal(inadimplencia);
                     Toast.makeText(getApplicationContext(),"Produto atualizado com sucesso!",Toast.LENGTH_SHORT).show();
                     gerarListaProdutos();
                 }
@@ -259,6 +266,69 @@ public class ClienteActivity extends AppCompatActivity {
                 confirmDeleteProduto(produto,dialog);
             }
         });
+    }
+    public void popupBaixaInadimplencia(){
+        AlertDialog.Builder dialogBuilder;
+        final AlertDialog dialog;
+        dialogBuilder = new AlertDialog.Builder(this);
+        final  View popupPagamentoView = getLayoutInflater().inflate(R.layout.popup_pagamento_parcial,null);
+        dialogBuilder.setView(popupPagamentoView);
+        dialog = dialogBuilder.create();
+        dialog.setTitle("Baixa parcial");
+        dialog.show();
+
+        TextView total = popupPagamentoView.findViewById(R.id.popup_edittext_pagamento_total);
+        total.setText(df.format(inadimplencia.getTotal()) +"R$");
+
+
+        final Button descontar = popupPagamentoView.findViewById(R.id.descontar);
+        descontar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (descontar.getText().equals("descontar")){
+                    inadimplenciaDAO.setValorTotal(inadimplencia);
+                    inadimplencia.setTotal(inadimplencia.getTotal() - Float.parseFloat(preco.getText().toString().trim()));
+                    Toast.makeText(getApplicationContext(),"Valor descontado com sucesso!",Toast.LENGTH_SHORT).show();
+                } else {
+                    inadimplencia.setQuitada(true);
+                    inadimplenciaDAO.setQuitInadimplencia(inadimplencia);
+                    Toast.makeText(getApplicationContext(),"Inadimplência quitada com sucesso!",Toast.LENGTH_SHORT).show();
+                    textViewdataPagamento.setText("");
+                }
+                dialog.dismiss();
+            }
+        });
+
+        preco = popupPagamentoView.findViewById(R.id.valor);
+        preco.addTextChangedListener(new TextWatcher() {
+            TextView resto_total = popupPagamentoView.findViewById(R.id.resto);
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (preco.getText().toString().trim().length() > 0){
+                    if (inadimplencia.getTotal() > Float.parseFloat(preco.getText().toString().trim())){
+                        resto_total.setText("Resto: " + df.format(inadimplencia.getTotal() - Float.parseFloat(preco.getText().toString().trim())));
+                        descontar.setText("Descontar");
+                    }else {
+                        resto_total.setText("Troco: " + df.format(inadimplencia.getTotal() - Float.parseFloat(preco.getText().toString().trim())).replaceAll("-",""));
+                        descontar.setText("Quitar");
+                    }
+                }else {
+                    resto_total.setText("");
+                }
+            }
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
+
+
+        gerarListaProdutos();
     }
     public void confirmDeleteCliente(){
         AlertDialog dialog = new AlertDialog.Builder(this)
@@ -280,7 +350,7 @@ public class ClienteActivity extends AppCompatActivity {
                     }
                 }).show();
     }
-    public void confirmDeleteProduto(final Produto produto, final AlertDialog dialogProduto){
+    public void confirmDeleteProduto(final Produto produto,final AlertDialog dialogProduto){
         AlertDialog dialog = new AlertDialog.Builder(this)
                 .setMessage("Deseja remover: "+produto.getNome()+" ?")
                 .setPositiveButton("Sim", new DialogInterface.OnClickListener() {
@@ -288,8 +358,11 @@ public class ClienteActivity extends AppCompatActivity {
                     public void onClick(DialogInterface dialog, int which) {
                         produtoDAO.deleteProdutoId(produto);
                         Toast.makeText(getApplicationContext(),"Produto removido com sucesso!",Toast.LENGTH_SHORT).show();
-                        gerarListaProdutos();
+                        inadimplencia.setTotal(inadimplencia.getTotal() - (produto.getQuantidade() * produto.getPreco()));
+                        inadimplenciaDAO.setValorTotal(inadimplencia);
                         dialogProduto.dismiss();
+                        dialog.dismiss();
+                        gerarListaProdutos();
                     }
 
                 })
@@ -299,8 +372,7 @@ public class ClienteActivity extends AppCompatActivity {
                         dialog.dismiss();
                     }
                 }).show();
-    }
-    public void dataPagamentoPopUp(){
+    }public void dataPagamentoPopUp(){
         AlertDialog.Builder dialogBuilder;
         final AlertDialog dialog;
         dialogBuilder = new AlertDialog.Builder(this);

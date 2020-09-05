@@ -17,9 +17,18 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/mainPesquisa"
         android:scrollbars="vertical"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
+        android:layout_margin="8sp"
+        android:layout_above="@id/btn_nova_inadimplencia"/>
+    <Button
+        android:id="@+id/btn_nova_inadimplencia"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Nova inadimplência"
+        android:gravity="center"
         android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentRight="true"
-        android:layout_margin="8sp"/>
-
+        android:layout_margin="5sp"/>
 </RelativeLayout>

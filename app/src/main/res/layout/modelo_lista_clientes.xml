@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent">
+
+    <TextView
+        android:id="@+id/nome"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="NOME"
+        android:layout_margin="5sp"
+        android:textStyle="bold"/>
+    <TextView
+        android:id="@+id/total"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@id/nome"
+        android:layout_alignTop="@id/nome"
+        android:layout_alignBottom="@id/nome"
+        android:gravity="center"
+        android:layout_marginLeft="5sp"
+        android:textStyle="bold"/>
+</RelativeLayout>
