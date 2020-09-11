@@ -20,14 +20,14 @@ public class ClienteDAO {
     public ClienteDAO(Context context){
         gerenciarBanco = new GerenciarBanco(context);
     }
-    public long cadastrarCliente(Cliente cliente){
+    public Cliente cadastrarCliente(Cliente cliente){
         banco = gerenciarBanco.getWritableDatabase();
         ContentValues dados = new ContentValues();
         dados.put(campos[1], cliente.getNome());
         dados.put(campos[2], cliente.getEmail());
-        long result = banco.insert(nomeTabela, null, dados);
+        cliente.setId(banco.insert(nomeTabela, null, dados));
         banco.close();
-        return result;
+        return cliente;
     }
     public ArrayList<Cliente> listaClientes(){
         ArrayList<Cliente> clientes = new ArrayList<>();

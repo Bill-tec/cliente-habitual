@@ -51,9 +51,11 @@ public class ClienteAdapter extends ArrayAdapter {
                 Calendar calendar = Calendar.getInstance();
                 if (calendar.getTime().after(inadimplencia.getDataFim().getTime())){
                     textViewTotal.setText(df.format(inadimplencia.getTotal()) + "R$ Pagamento atrasado!");
+                } else {
+                    textViewTotal.setText(df.format(inadimplencia.getTotal())+" R$");
                 }
             } else{
-                textViewTotal.setText(df.format(inadimplencia.getTotal())+"R$");
+                textViewTotal.setText(df.format(inadimplencia.getTotal())+" R$");
             }
         }
         return rowView;

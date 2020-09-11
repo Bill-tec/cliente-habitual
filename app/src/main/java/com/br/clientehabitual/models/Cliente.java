@@ -3,21 +3,21 @@ package com.br.clientehabitual.models;
 import androidx.annotation.NonNull;
 
 public class Cliente {
-    private int id;
+    private long id;
     private  String nome;
     private  String email;
 
-    public Cliente(int id, String nome, String email) {
+    public Cliente(long id, String nome, String email) {
         this.id = id;
         this.nome = nome;
         this.email = email;
     }
 
-    public int getId() {
+    public long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(long id) {
         this.id = id;
     }
 

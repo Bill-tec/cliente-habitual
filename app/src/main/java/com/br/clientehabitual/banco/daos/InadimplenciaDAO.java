@@ -26,7 +26,7 @@ public class InadimplenciaDAO {
         dados.put(campos[1], converter.calendarToString(inadimplencia.getDataInicio()));
         dados.put(campos[3], inadimplencia.getCliente().getId());
         dados.put(campos[4], 0);
-        dados.put(campos[5], 0);
+        dados.put(campos[5], inadimplencia.getTotal());
         inadimplencia.setId(banco.insert(nomeTabela,null,dados));
         banco.close();
         return inadimplencia;
@@ -38,11 +38,8 @@ public class InadimplenciaDAO {
         Cursor cursor = db.query(nomeTabela, campos,where, null,null,null,null);
         if (cursor.moveToNext()) {
             inadimplencia = new Inadimplencia(cursor.getLong(0),converter.stringToCalendar(
-                    cursor.getString(1)) , null, cliente, false);
-            inadimplencia.setTotal(cursor.getFloat(5));
-            if (cursor.getString(2) != null) {
-                inadimplencia.setDataFim(converter.stringToCalendar(cursor.getString(2)));
-            }
+                    cursor.getString(1)) , converter.stringToCalendar(cursor.getString(2)),
+                    cliente, false, cursor.getFloat(5));
             if (cursor.getInt(4) == 1){
                 inadimplencia.setQuitada(true);
             }

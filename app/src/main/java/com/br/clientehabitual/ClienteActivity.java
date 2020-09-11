@@ -92,12 +92,12 @@ public class ClienteActivity extends AppCompatActivity {
                 } else {
                      if (inadimplencia == null){
                          Calendar data = Calendar.getInstance();
-                         inadimplencia = new Inadimplencia(0,data, null,cliente, false);
+                         inadimplencia = new Inadimplencia(0,data, null,cliente, false,0);
                          inadimplencia = inadimplenciaDAO.newInadimplencia(inadimplencia);
-                     } else if (inadimplencia.isQuitada() == true){
+                     } else if (inadimplencia.isQuitada()){
                          inadimplenciaDAO.deleteInadimplencia(inadimplencia);
                          Calendar data = Calendar.getInstance();
-                         inadimplencia = new Inadimplencia(0,data, null,cliente, false);
+                         inadimplencia = new Inadimplencia(0,data, null,cliente, false, 0);
                          inadimplencia = inadimplenciaDAO.newInadimplencia(inadimplencia);
                      }
                      inadimplencia.setTotal(inadimplencia.getTotal() + (produto.getQuantidade() * produto.getPreco()));
@@ -372,7 +372,8 @@ public class ClienteActivity extends AppCompatActivity {
                         dialog.dismiss();
                     }
                 }).show();
-    }public void dataPagamentoPopUp(){
+    }
+    public void dataPagamentoPopUp(){
         AlertDialog.Builder dialogBuilder;
         final AlertDialog dialog;
         dialogBuilder = new AlertDialog.Builder(this);
