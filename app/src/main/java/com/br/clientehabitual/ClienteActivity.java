@@ -16,6 +16,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -42,7 +43,7 @@ public class ClienteActivity extends AppCompatActivity {
     private ProdutoDAO produtoDAO = new ProdutoDAO(this);
     private Inadimplencia inadimplencia;
     private InadimplenciaDAO inadimplenciaDAO = new InadimplenciaDAO(this);
-    private DecimalFormat df = new DecimalFormat("#.00");
+    private DecimalFormat df = new DecimalFormat("#0.00");
 
     private Conversoes converter = new Conversoes();
     @Override
@@ -166,6 +167,9 @@ public class ClienteActivity extends AppCompatActivity {
 
         nome = (EditText)popupClienteView.findViewById(R.id.popupNome);
         email = (EditText)popupClienteView.findViewById(R.id.popupEmail);
+        CheckBox checkBox = popupClienteView.findViewById(R.id.check_listar);
+        checkBox.setVisibility(View.INVISIBLE);
+        
         nome.setText(cliente.getNome());
         email.setText(cliente.getEmail());
         Button add = popupClienteView.findViewById(R.id.btnProximo);

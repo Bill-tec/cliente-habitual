@@ -7,7 +7,8 @@
         android:layout_height="wrap_content"
         android:hint="DIA/MÊS/ANO"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="5sp"/>
+        android:layout_marginTop="5sp"
+        android:inputType="numberDecimal"/>
     <Button
         android:id="@+id/btn_pupup_data_dalvar"
         android:text="Salvar"

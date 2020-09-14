@@ -18,7 +18,8 @@
         android:inputType="numberDecimal"
         android:hint="00.00"
         android:layout_margin="10sp"
-        android:layout_toLeftOf="@id/sifrao"/>
+        android:layout_toLeftOf="@id/sifrao"
+        android:maxLength="6"/>
     <TextView
         android:id="@+id/sifrao"
         android:layout_width="wrap_content"

@@ -44,8 +44,10 @@
         android:layout_alignTop="@+id/btnProximo"
         android:layout_alignBottom="@+id/btnProximo"
         android:layout_toRightOf="@id/popup_data_pagamento"
-        android:layout_marginLeft="20sp"
+        android:layout_marginLeft="10sp"
         android:visibility="invisible"
+        android:inputType="numberDecimal"
+        android:maxLength="6"
         />
     <TextView
         android:id="@+id/sifrao"
@@ -66,5 +68,6 @@
         android:layout_alignTop="@id/btnProximo"
         android:layout_alignBottom="@id/btnProximo"
         android:hint="Pagamento"
-        android:visibility="invisible"/>
+        android:visibility="invisible"
+        android:inputType="numberDecimal"/>
 </RelativeLayout>
