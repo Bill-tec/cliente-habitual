@@ -43,7 +43,7 @@
         android:hint="00.00"
         android:layout_alignTop="@+id/btnProximo"
         android:layout_alignBottom="@+id/btnProximo"
-        android:layout_toRightOf="@id/popup_data_pagamento"
+        android:layout_toRightOf="@id/sifrao"
         android:layout_marginLeft="10sp"
         android:visibility="invisible"
         android:inputType="numberDecimal"
@@ -56,10 +56,9 @@
         android:text="R$"
         android:layout_alignTop="@+id/btnProximo"
         android:layout_alignBottom="@+id/btnProximo"
-        android:layout_toRightOf="@id/popup_cliente_valor"
-        android:gravity="center|start"
-        android:layout_marginRight="5sp"
-        android:layout_toLeftOf="@id/btnProximo"
+        android:layout_toRightOf="@id/popup_data_pagamento"
+        android:gravity="center|end"
+        android:layout_marginLeft="10sp"
         android:visibility="invisible"/>
     <EditText
         android:id="@+id/popup_data_pagamento"

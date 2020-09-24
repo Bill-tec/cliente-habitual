@@ -32,9 +32,9 @@ public class ClienteDAO {
     public ArrayList<Cliente> listaClientes(){
         ArrayList<Cliente> clientes = new ArrayList<>();
         SQLiteDatabase db = gerenciarBanco.getReadableDatabase();
-        Cursor cursor = db.query(nomeTabela, campos, null, null, null, null, "nome ASC");
+        Cursor cursor = db.query(nomeTabela, campos, null, null, null, null, campos[1]+ " ASC");
         while(cursor.moveToNext()){
-            Cliente c = new Cliente(cursor.getInt(0),
+            Cliente c = new Cliente(cursor.getLong(0),
                     cursor.getString(1),cursor.getString(2));
             clientes.add(c);
         };

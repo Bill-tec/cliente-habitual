@@ -9,7 +9,7 @@ public class Conversoes {
         String dataString = "";
         Date data = calendar.getTime();
         try {
-            SimpleDateFormat dataSimple = new SimpleDateFormat("dd-MM-yyyy");
+            SimpleDateFormat dataSimple = new SimpleDateFormat("dd/MM/yyyy");
             dataString = dataSimple.format(data);
         }catch (Exception e){}
         return dataString;
@@ -18,7 +18,7 @@ public class Conversoes {
         Calendar data = Calendar.getInstance();
         SimpleDateFormat dataSimple = new SimpleDateFormat("dd-MM-yyyy");
         try {
-            data.setTime(dataSimple.parse(dataString));
+            data.setTime(dataSimple.parse(dataString.replaceAll("/","-")));
         }catch (Exception e){}
         return data;
     }

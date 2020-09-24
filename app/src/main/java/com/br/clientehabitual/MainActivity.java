@@ -11,7 +11,6 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
@@ -26,6 +25,7 @@ import com.br.clientehabitual.models.Cliente;
 import com.br.clientehabitual.models.Inadimplencia;
 import com.br.clientehabitual.util.Conversoes;
 import com.github.rtoshiro.util.format.SimpleMaskFormatter;
+import com.github.rtoshiro.util.format.pattern.MaskPattern;
 import com.github.rtoshiro.util.format.text.MaskTextWatcher;
 
 import java.text.DecimalFormat;
@@ -38,7 +38,7 @@ public class MainActivity extends AppCompatActivity {
     private CheckBox registrarProdutos;
     private ListView lista;
     private ArrayList<Cliente> clientes;
-    private ArrayAdapter adapter;
+    private ClienteAdapter adapter;
     private Conversoes conversoes;
     private ClienteDAO clienteDAO = new ClienteDAO(this);
     private InadimplenciaDAO inadimplenciaDAO = new InadimplenciaDAO(this);
@@ -47,6 +47,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        gerarListaClientes();
 
         Button novaInadimplencia = findViewById(R.id.btn_nova_inadimplencia);
         novaInadimplencia.setOnClickListener(new View.OnClickListener() {
@@ -62,7 +63,7 @@ public class MainActivity extends AppCompatActivity {
         gerarListaClientes();
     }
     public void gerarListaClientes(){
-        clientes = clienteDAO.listaClientes();
+        clientes = ordenarAtrazado();
 
         lista = findViewById(R.id.mainLista);
         adapter = new ClienteAdapter(this,clientes);
@@ -96,8 +97,13 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                MainActivity.this.adapter.getFilter().filter(s);
-                adapter.notifyDataSetChanged();
+                if (clientes.isEmpty() == false && pesquisa.length() > 0){
+                    adapter = new ClienteAdapter(MainActivity.this, filtrar(clientes));
+                    lista.setAdapter(adapter);
+                } else {
+                    adapter = new ClienteAdapter(MainActivity.this,clientes);
+                    lista.setAdapter(adapter);
+                }
             }
 
             @Override
@@ -122,18 +128,28 @@ public class MainActivity extends AppCompatActivity {
         final EditText nome = (EditText)popupClienteView.findViewById(R.id.popupNome);
         final EditText email = (EditText)popupClienteView.findViewById(R.id.popupEmail);
 
-        valorpopup = popupClienteView.findViewById(R.id.popup_cliente_valor);
-        dataPagamento = popupClienteView.findViewById(R.id.popup_data_pagamento);
+        valorpopup = (EditText)popupClienteView.findViewById(R.id.popup_cliente_valor);
+        dataPagamento = (EditText)popupClienteView.findViewById(R.id.popup_data_pagamento);
 
         final TextView sifrao = popupClienteView.findViewById(R.id.sifrao);
 
-        add = popupClienteView.findViewById(R.id.btnProximo);
+        add = (Button)popupClienteView.findViewById(R.id.btnProximo);
 
-        registrarProdutos = popupClienteView.findViewById(R.id.check_listar);
+        SimpleMaskFormatter maskData = new SimpleMaskFormatter("[0-3][0-9]/[0-1][0-9]/[0-9][0-9][0-9][0-9]");
+        MaskPattern maskPattern1 = new MaskPattern("[0-1]");
+        MaskPattern maskPattern2 = new MaskPattern("[0-3]");
+        MaskPattern maskPattern3 = new MaskPattern("[0-9]");
+        maskData.registerPattern(maskPattern1);
+        maskData.registerPattern(maskPattern2);
+        maskData.registerPattern(maskPattern3);
+        MaskTextWatcher maskTextWatcher = new MaskTextWatcher(dataPagamento, maskData);
+        dataPagamento.addTextChangedListener(maskTextWatcher);
+
+        registrarProdutos = (CheckBox)popupClienteView.findViewById(R.id.check_listar);
         registrarProdutos.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (registrarProdutos.isChecked()){
+                if (registrarProdutos.isChecked()) {
                     valorpopup.setVisibility(View.INVISIBLE);
                     dataPagamento.setVisibility(View.INVISIBLE);
                     sifrao.setVisibility(View.INVISIBLE);
@@ -145,98 +161,42 @@ public class MainActivity extends AppCompatActivity {
                     dataPagamento.setVisibility(View.VISIBLE);
                     sifrao.setVisibility(View.VISIBLE);
                     add.setText("Salvar");
-                    dataPagamento.addTextChangedListener(new TextWatcher() {
-                        String current = "";
-                        String ddmmyyyy = "DDMMYYYY";
-                        Calendar cal = Calendar.getInstance();
+
+                    add.setOnClickListener(new View.OnClickListener() {
                         @Override
-                        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-                        }
-
-                        @Override
-                        public void onTextChanged(CharSequence s, int start, int before, int count) {
-                            if (!s.toString().equals(current)) {
-                                String clean = s.toString().replaceAll("[^\\d.]|\\.", "");
-                                String cleanC = current.replaceAll("[^\\d.]|\\.", "");
-
-                                int cl = clean.length();
-                                int sel = cl;
-                                for (int i = 2; i <= cl && i < 6; i += 2) {
-                                    sel++;
+                        public void onClick(View v) {
+                            Cliente cliente = new Cliente(0, nome.getText().toString().trim(),
+                                    email.getText().toString().trim());
+                            if (add.getText().toString().equals("Proximo")) {
+                                if (cliente.getNome().length() == 0) {
+                                    Toast.makeText(getApplicationContext(), "Preencha os campos, e tente novamente!", Toast.LENGTH_SHORT).show();
+                                } else {
+                                    dialog.dismiss();
+                                    Intent intent = new Intent(MainActivity.this, ClienteActivity.class);
+                                    intent.putExtra("id", Long.toString(clienteDAO.cadastrarCliente(cliente).getId()));
+                                    startActivity(intent);
                                 }
-                                if (clean.equals(cleanC)) sel--;
-
-                                if (clean.length() < 8){
-                                    clean = clean + ddmmyyyy.substring(clean.length());
-                                }else{
-                                    int day  = Integer.parseInt(clean.substring(0,2));
-                                    int mon  = Integer.parseInt(clean.substring(2,4));
-                                    int year = Integer.parseInt(clean.substring(4,8));
-
-                                    mon = mon < 1 ? 1 : mon > 12 ? 12 : mon;
-                                    cal.set(Calendar.MONTH, mon-1);
-                                    year = (year<1900)?1900:(year>2100)?2100:year;
-                                    cal.set(Calendar.YEAR, year);
-
-                                    day = (day > cal.getActualMaximum(Calendar.DATE))? cal.getActualMaximum(Calendar.DATE):day;
-                                    clean = String.format("%02d%02d%02d",day, mon, year);
+                            } else {
+                                /* ADICIONANDO APENAS O VALOR DA INADIMPLÊCIA*/
+                                conversoes = new Conversoes();
+                                Calendar data = Calendar.getInstance();
+                                Inadimplencia inadimplencia = new Inadimplencia(0, data, conversoes.stringToCalendar(dataPagamento.getText().toString().trim().replaceAll("/", "-")),
+                                        cliente, false, Float.parseFloat(valorpopup.getText().toString().trim()));
+                                if (cliente.getNome().length() == 0 || inadimplencia.getDataFim() == null || inadimplencia.getTotal() <= 0) {
+                                    Toast.makeText(getApplicationContext(), "Preencha os campos, e tente novamente!", Toast.LENGTH_SHORT).show();
+                                } else {
+                                    dialog.dismiss();
+                                    cliente = clienteDAO.cadastrarCliente(cliente);
+                                    inadimplencia.setCliente(cliente);
+                                    inadimplencia = inadimplenciaDAO.newInadimplencia(inadimplencia);
+                                    inadimplenciaDAO.setDataPagamentoInadimplencia(inadimplencia);
+                                    Toast.makeText(getApplicationContext(), "Inadimplência registrada com sucesso!", Toast.LENGTH_LONG).show();
                                 }
-
-                                clean = String.format("%s/%s/%s", clean.substring(0, 2),
-                                        clean.substring(2, 4),
-                                        clean.substring(4, 8));
-
-                                sel = sel < 0 ? 0 : sel;
-                                current = clean;
-                                dataPagamento.setText(current);
-                                dataPagamento.setSelection(sel < current.length() ? sel : current.length());
                             }
-
-
-                        }
-
-                        @Override
-                        public void afterTextChanged(Editable s) {
-
+                            gerarListaClientes();
                         }
                     });
                 }
-            }
-        });
-
-
-        add.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Cliente cliente = new Cliente(0, nome.getText().toString().trim(),
-                        email.getText().toString().trim());
-                if (add.getText().toString().equals("Proximo")){
-                    if (cliente.getNome().length() == 0){
-                        Toast.makeText(getApplicationContext(),"Preencha os campos, e tente novamente!",Toast.LENGTH_SHORT).show();
-                    } else {
-                        dialog.dismiss();
-                        Intent intent = new Intent(MainActivity.this, ClienteActivity.class);
-                        intent.putExtra("id",Long.toString(clienteDAO.cadastrarCliente(cliente).getId()));
-                        startActivity(intent);
-                    }
-                } else{
-                    /* ADICIONANDO APENAS O VALOR DA INADIMPLÊCIA*/
-                    conversoes = new Conversoes();
-                    Calendar data = Calendar.getInstance();
-                    Inadimplencia inadimplencia = new Inadimplencia(0, data, conversoes.stringToCalendar(dataPagamento.getText().toString().replaceAll("/","-")),
-                            cliente, false, Float.parseFloat(valorpopup.getText().toString().trim()));
-                    if (cliente.getNome().length() == 0 || inadimplencia.getDataFim() == null || inadimplencia.getTotal() <= 0){
-                        Toast.makeText(getApplicationContext(),"Preencha os campos, e tente novamente!",Toast.LENGTH_SHORT).show();
-                    } else {
-                        dialog.dismiss();
-                        cliente = clienteDAO.cadastrarCliente(cliente);
-                        inadimplencia.setCliente(cliente);
-                        inadimplencia = inadimplenciaDAO.newInadimplencia(inadimplencia);
-                        inadimplenciaDAO.setDataPagamentoInadimplencia(inadimplencia);
-                        Toast.makeText(getApplicationContext(),"Cliente cadastrado com sucesso!",Toast.LENGTH_LONG).show();
-                    }
-                }
-                gerarListaClientes();
             }
         });
     }
@@ -247,12 +207,14 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.dismiss();
+                        conversoes = new Conversoes();
+                        String valor = df.format(inadimplencia.getTotal()).replaceAll(".",",");
+                        String data = conversoes.calendarToString(inadimplencia.getDataFim()).replaceAll("-","/");
                         String assunto = "Referente a inadimplência";
                         String mensagem = "Caro cliente: "+ inadimplencia.getCliente().getNome() + " por meio desse E-mail " +
-                                "estamos entrando em contato com você para avisar sobre sua divida de: " +
-                                df.format(inadimplencia.getTotal()+"R$".replaceAll(".",",")) +" com data de pagamento expirada no dia: "
-                                + (conversoes.calendarToString(inadimplencia.getDataFim()).replaceAll("-","/")) +
-                                " pedimos que compareça ao nosso estabelecimento para esclarecimentos e se possivel quitar sua divida. Atenciosamente: ";
+                                "estamos entrando em contato com você para avisar sobre sua divida de: R$ " +
+                                valor +" com data de pagamento expirada no dia: " + data +
+                                " pedimos que compareça ao nosso estabelecimento para quitar sua divida. Atenciosamente: ";
 
                         Intent intent = new Intent(Intent.ACTION_SEND);
                         intent.setData(Uri.parse("mailto:"));
@@ -264,7 +226,6 @@ public class MainActivity extends AppCompatActivity {
 
                         try {
                             startActivity(Intent.createChooser(intent,"Enviar E-mail"));
-                            Toast.makeText(getApplicationContext(), "E-mail enviado com sucesso!",Toast.LENGTH_SHORT).show();
                         }catch (Exception e){
                             Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
                         }
@@ -279,5 +240,43 @@ public class MainActivity extends AppCompatActivity {
                         startActivityCliente(inadimplencia.getCliente());
                     }
                 }).show();
+    }
+    public ArrayList<Cliente> filtrar(ArrayList<Cliente> clientes){
+        String pesquisaString = pesquisa.getText().toString();
+        ArrayList<Cliente> clientesFiltrados = new ArrayList<>();
+        for (Cliente c : clientes){
+            if (pesquisaString.length() <= c.getNome().length()){
+                if (pesquisaString.equalsIgnoreCase((String) c.getNome().subSequence(0, pesquisaString.length()))){
+                    clientesFiltrados.add(c);
+                }
+            }
+        }
+        return clientesFiltrados;
+    }
+    public ArrayList<Cliente> ordenarAtrazado(){
+        clientes = clienteDAO.listaClientes();
+        ArrayList<Cliente> organizado = new ArrayList<>();
+        ArrayList<Cliente> emDia = new ArrayList<>();
+        for (Cliente c : clientes){
+            Inadimplencia inadimplencia = inadimplenciaDAO.getInadimpleciaCliente(c);
+            if (inadimplencia != null){
+                if (inadimplencia.isQuitada()){
+                    emDia.add(c);
+                } else{
+                    if(inadimplencia.getDataFim() != null){
+                        Calendar calendar = Calendar.getInstance();
+                        if (calendar.getTime().after(inadimplencia.getDataFim().getTime())){
+                            organizado.add(c);
+                        } else{
+                            emDia.add(c);
+                        }
+                    }
+                }
+            } else{
+                emDia.add(c);
+            }
+        }
+        organizado.addAll(emDia);
+        return organizado;
     }
 }

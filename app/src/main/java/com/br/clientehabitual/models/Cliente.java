@@ -1,9 +1,7 @@
 package com.br.clientehabitual.models;
 
-import androidx.annotation.NonNull;
-
 public class Cliente {
-    private long id;
+    private  long id;
     private  String nome;
     private  String email;
 
@@ -37,7 +35,7 @@ public class Cliente {
         this.email = email;
     }
 
-    @NonNull
+
     @Override
     public String toString() {
         return nome;

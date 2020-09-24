@@ -1,5 +1,7 @@
 package com.br.clientehabitual.models;
 
+import androidx.annotation.NonNull;
+
 import java.util.ArrayList;
 import java.util.Calendar;
 
@@ -31,10 +33,6 @@ public class Inadimplencia {
 
     public Calendar getDataInicio() {
         return dataInicio;
-    }
-
-    public void setDataInicio(Calendar dataInicio) {
-        this.dataInicio = dataInicio;
     }
 
     public Calendar getDataFim() {
@@ -77,4 +75,9 @@ public class Inadimplencia {
         this.total = total;
     }
 
+    @NonNull
+    @Override
+    public String toString() {
+        return cliente.getNome();
+    }
 }
