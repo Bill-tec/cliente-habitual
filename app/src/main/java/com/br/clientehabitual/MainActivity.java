@@ -2,13 +2,27 @@ package com.br.clientehabitual;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.NotificationCompat;
 
+import android.app.AlarmManager;
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.app.job.JobInfo;
+import android.app.job.JobScheduler;
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.PersistableBundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
@@ -23,6 +37,7 @@ import com.br.clientehabitual.banco.daos.ClienteDAO;
 import com.br.clientehabitual.banco.daos.InadimplenciaDAO;
 import com.br.clientehabitual.models.Cliente;
 import com.br.clientehabitual.models.Inadimplencia;
+import com.br.clientehabitual.notificacao.JobServiceNotification;
 import com.br.clientehabitual.util.Conversoes;
 import com.github.rtoshiro.util.format.SimpleMaskFormatter;
 import com.github.rtoshiro.util.format.pattern.MaskPattern;
@@ -42,11 +57,12 @@ public class MainActivity extends AppCompatActivity {
     private Conversoes conversoes;
     private ClienteDAO clienteDAO = new ClienteDAO(this);
     private InadimplenciaDAO inadimplenciaDAO = new InadimplenciaDAO(this);
-    private DecimalFormat df = new DecimalFormat("#0.00");
+    private DecimalFormat df = new DecimalFormat("#0,00");
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        iniciarJobScheduler();
         gerarListaClientes();
 
         Button novaInadimplencia = findViewById(R.id.btn_nova_inadimplencia);
@@ -56,6 +72,28 @@ public class MainActivity extends AppCompatActivity {
                 popupNovoCliente();
             }
         });
+
+    }
+    public void iniciarJobScheduler(){
+        Log.d("MainActivity", "Iniciou JOB");
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
+            ComponentName componentName = new ComponentName(this, JobServiceNotification.class);
+            PersistableBundle persistableBundle = new PersistableBundle();
+            persistableBundle.putString("string","coisa");
+            JobInfo.Builder builder = new JobInfo.Builder(1, componentName)
+                    .setBackoffCriteria(28800000, JobInfo.BACKOFF_POLICY_LINEAR)
+                    .setExtras(persistableBundle)
+                    .setPersisted(true)
+                    .setRequiresCharging(false)
+                    .setRequiresDeviceIdle(false);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N){
+                builder.setPeriodic(3000, 6000);
+            } else {
+                builder.setPeriodic(28800000);
+            }
+            JobScheduler jobScheduler = (JobScheduler) getSystemService(Context.JOB_SCHEDULER_SERVICE);
+            jobScheduler.schedule(builder.build());
+        }
     }
     @Override
     protected void onResume() {
@@ -75,17 +113,26 @@ public class MainActivity extends AppCompatActivity {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Inadimplencia inadimplencia = inadimplenciaDAO.getInadimpleciaCliente(clientes.get(position));
                 if (inadimplencia != null){
-                    if (inadimplencia.isQuitada()){
-                        startActivityCliente(clientes.get(position));
-                    }
                     Calendar calendar = Calendar.getInstance();
-                    if (calendar.getTime().after(inadimplencia.getDataFim().getTime()) && clientes.get(position).getEmail().length() > 0){
-                        emailConfirm(inadimplencia);
+                    if (inadimplencia.getDataFim() ==  null){
+                        Intent intent = new Intent(MainActivity.this, ClienteActivity.class);
+                        intent.putExtra("id",Long.toString(clientes.get(position).getId()));
+                        startActivity(intent);
+                    }
+                    else if (calendar.getTime().after(inadimplencia.getDataFim().getTime()) && inadimplencia.isQuitada() == false){
+                        if (clientes.get(position).getEmail().length() < 1){
+                            Toast.makeText(getApplicationContext(),"Nenhum E-mail registrado para cobrança, Atualize os dados do cliente ou digite manualmente!",Toast.LENGTH_LONG).show();
+                        }
+                            emailConfirm(inadimplencia);
                     } else {
-                        startActivityCliente(clientes.get(position));
+                        Intent intent = new Intent(MainActivity.this, ClienteActivity.class);
+                        intent.putExtra("id",Long.toString(clientes.get(position).getId()));
+                        startActivity(intent);
                     }
                 } else{
-                    startActivityCliente(clientes.get(position));
+                        Intent intent = new Intent(MainActivity.this, ClienteActivity.class);
+                        intent.putExtra("id",Long.toString(clientes.get(position).getId()));
+                        startActivity(intent);
                 }
             }
         });
@@ -109,11 +156,6 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void afterTextChanged(Editable s) {}
         });
-    }
-    public void startActivityCliente(Cliente cliente){
-        Intent intent = new Intent(MainActivity.this, ClienteActivity.class);
-        intent.putExtra("id",Long.toString(cliente.getId()));
-        startActivity(intent);
     }
     public void popupNovoCliente(){
         AlertDialog.Builder dialogBuilder;
@@ -208,12 +250,11 @@ public class MainActivity extends AppCompatActivity {
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.dismiss();
                         conversoes = new Conversoes();
-                        String valor = df.format(inadimplencia.getTotal()).replaceAll(".",",");
                         String data = conversoes.calendarToString(inadimplencia.getDataFim()).replaceAll("-","/");
                         String assunto = "Referente a inadimplência";
                         String mensagem = "Caro cliente: "+ inadimplencia.getCliente().getNome() + " por meio desse E-mail " +
                                 "estamos entrando em contato com você para avisar sobre sua divida de: R$ " +
-                                valor +" com data de pagamento expirada no dia: " + data +
+                                df.format(inadimplencia.getTotal()) +" com data de pagamento expirada no dia: " + data +
                                 " pedimos que compareça ao nosso estabelecimento para quitar sua divida. Atenciosamente: ";
 
                         Intent intent = new Intent(Intent.ACTION_SEND);
@@ -237,7 +278,9 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.dismiss();
-                        startActivityCliente(inadimplencia.getCliente());
+                        Intent intent = new Intent(MainActivity.this, ClienteActivity.class);
+                        intent.putExtra("id",Long.toString(inadimplencia.getCliente().getId()));
+                        startActivity(intent);
                     }
                 }).show();
     }

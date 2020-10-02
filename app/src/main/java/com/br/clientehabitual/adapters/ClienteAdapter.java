@@ -44,7 +44,7 @@ public class ClienteAdapter extends ArrayAdapter<Cliente>{
 
         textViewNome.setText(clientes.get(position).getNome());
 
-        DecimalFormat df = new DecimalFormat("#0.00");
+        DecimalFormat df = new DecimalFormat("#0,00");
         InadimplenciaDAO inadimplenciaDAO = new InadimplenciaDAO(context);
         Inadimplencia inadimplencia = inadimplenciaDAO.getInadimpleciaCliente(clientes.get(position));
 
