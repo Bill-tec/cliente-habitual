@@ -15,6 +15,7 @@ import com.br.clientehabitual.models.Produto;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.regex.Pattern;
 
 public class ProdutoAdapter extends ArrayAdapter<Produto> {
     private final Context context;
@@ -40,9 +41,9 @@ public class ProdutoAdapter extends ArrayAdapter<Produto> {
 
         textViewQuantidade.setText(Integer.toString(produtos.get(position).getQuantidade()));
         textViewNome.setText(produtos.get(position).getNome());
-        textViewPrecoUnd.setText(df.format(produtos.get(position).getPreco()));
+        textViewPrecoUnd.setText(df.format(produtos.get(position).getPreco()).replaceAll(Pattern.quote("."),","));
         textViewPrecoTotal.setText(df.format(produtos.get(position).getQuantidade() *
-                produtos.get(position).getPreco()));
+                produtos.get(position).getPreco()).replaceAll(Pattern.quote("."),","));
 
         return rowView;
     }

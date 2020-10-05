@@ -37,6 +37,7 @@ import com.github.rtoshiro.util.format.text.MaskTextWatcher;
 
 import java.text.DecimalFormat;
 import java.util.Calendar;
+import java.util.regex.Pattern;
 
 public class ClienteActivity extends AppCompatActivity {
     private EditText nome, email,preco, quantidade, date;
@@ -211,18 +212,20 @@ public class ClienteActivity extends AppCompatActivity {
             ArrayAdapter adapter = new ProdutoAdapter(this,inadimplencia.getProdutos());
             lista.setAdapter(adapter);
             total = findViewById(R.id.label_Total);
-            if (inadimplencia.isQuitada()){
-                total.setText("Quitada!");
-                total.setTextColor(Color.GREEN);
-            } else {
-                total.setText("R$ " + df.format(inadimplencia.getTotal()));
-                total.setTextColor(Color.BLACK);
-            }
+
             total.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    String totalString = df.format(inadimplencia.getTotal()).replaceAll(Pattern.quote ("."),",");
+                    if (inadimplencia.isQuitada()){
+                        total.setText("Quitada!");
+                        total.setTextColor(Color.GREEN);
+                    } else {
+                        total.setText("R$ " + totalString);
+                        total.setTextColor(Color.BLACK);
+                    }
                     if (total.getText().toString().equals("Quitada!")){
-                        total.setText("R$ " + df.format(inadimplencia.getTotal()));
+                        total.setText("R$ " + totalString);
                         total.setTextColor(Color.BLACK);
                     } else{
                         total.setText("Quitada!");
@@ -304,6 +307,7 @@ public class ClienteActivity extends AppCompatActivity {
         dialog.show();
 
         TextView total = popupPagamentoView.findViewById(R.id.popup_edittext_pagamento_total);
+
         total.setText(df.format(inadimplencia.getTotal()) +"R$");
 
 
@@ -311,7 +315,7 @@ public class ClienteActivity extends AppCompatActivity {
         descontar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (descontar.getText().equals("descontar")){
+                if (descontar.getText().equals("Descontar")){
                     inadimplenciaDAO.setValorTotal(inadimplencia);
                     inadimplencia.setTotal(inadimplencia.getTotal() - Float.parseFloat(preco.getText().toString().trim()));
                     Toast.makeText(getApplicationContext(),"Valor descontado com sucesso!",Toast.LENGTH_SHORT).show();

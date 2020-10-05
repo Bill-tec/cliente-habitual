@@ -25,6 +25,7 @@ import com.br.clientehabitual.models.Inadimplencia;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.regex.Pattern;
 
 @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
 public class JobServiceNotification  extends JobService {
@@ -41,14 +42,14 @@ public class JobServiceNotification  extends JobService {
     public void gerarNotificacao(Context context, Inadimplencia inadimplencia){
         NotificationManager notificationManager = (NotificationManager) context.getSystemService(context.NOTIFICATION_SERVICE);
         PendingIntent pendingIntent = PendingIntent.getActivity(context,0,new Intent(context, MainActivity.class),0);
-        String NOTIFICATION_CHANNEL_ID = "my_channel_id_01";
+        String NOTIFICATION_CHANNEL_ID = "cliente_habitual_channel_id_01";
 
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            NotificationChannel notificationChannel = new NotificationChannel(NOTIFICATION_CHANNEL_ID, "My Notifications", NotificationManager.IMPORTANCE_DEFAULT);
+            NotificationChannel notificationChannel = new NotificationChannel(NOTIFICATION_CHANNEL_ID, "Notificações de atrazados", NotificationManager.IMPORTANCE_DEFAULT);
 
             // Configure the notification channel.
-            notificationChannel.setDescription("Channel description");
+            notificationChannel.setDescription("Notificação de pagamentos atrazados");
             notificationChannel.enableLights(true);
             notificationChannel.setLightColor(Color.RED);
             notificationChannel.setVibrationPattern(new long[]{0, 1000, 500, 1000});
@@ -56,16 +57,16 @@ public class JobServiceNotification  extends JobService {
             notificationManager.createNotificationChannel(notificationChannel);
         }
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_ID);
-        DecimalFormat df = new DecimalFormat("#0,00");
+        DecimalFormat df = new DecimalFormat("#0.00");
         notificationBuilder.setAutoCancel(true)
                 .setDefaults(Notification.DEFAULT_ALL)
                 .setWhen(System.currentTimeMillis())
                 .setSmallIcon(R.drawable.ic_launcher_background)
-                .setTicker("Cliente Habitual")
+                .setTicker("Cliente Habitual! 'Pagamentos atrazados!'")
                 .setPriority(Notification.PRIORITY_MAX)
                 .setContentTitle(inadimplencia.getCliente().getNome())
                 .setContentIntent(pendingIntent)
-                .setContentInfo("R$ "+ df.format(inadimplencia.getTotal()))
+                .setContentInfo("R$ "+ df.format(inadimplencia.getTotal()).replaceAll(Pattern.quote("."),","))
                 .setContentText("Data para pagamento expirou!");
 
         notificationManager.notify((int)inadimplencia.getCliente().getId(), notificationBuilder.build());

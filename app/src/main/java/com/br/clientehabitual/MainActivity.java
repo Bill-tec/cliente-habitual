@@ -2,27 +2,19 @@ package com.br.clientehabitual;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.NotificationCompat;
 
-import android.app.AlarmManager;
-import android.app.Notification;
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.app.job.JobInfo;
 import android.app.job.JobScheduler;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.PersistableBundle;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
@@ -46,6 +38,7 @@ import com.github.rtoshiro.util.format.text.MaskTextWatcher;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.regex.Pattern;
 
 public class MainActivity extends AppCompatActivity {
     private EditText pesquisa, valorpopup, dataPagamento;
@@ -57,7 +50,7 @@ public class MainActivity extends AppCompatActivity {
     private Conversoes conversoes;
     private ClienteDAO clienteDAO = new ClienteDAO(this);
     private InadimplenciaDAO inadimplenciaDAO = new InadimplenciaDAO(this);
-    private DecimalFormat df = new DecimalFormat("#0,00");
+    private DecimalFormat df = new DecimalFormat("#0.00");
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -75,11 +68,9 @@ public class MainActivity extends AppCompatActivity {
 
     }
     public void iniciarJobScheduler(){
-        Log.d("MainActivity", "Iniciou JOB");
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
             ComponentName componentName = new ComponentName(this, JobServiceNotification.class);
             PersistableBundle persistableBundle = new PersistableBundle();
-            persistableBundle.putString("string","coisa");
             JobInfo.Builder builder = new JobInfo.Builder(1, componentName)
                     .setBackoffCriteria(28800000, JobInfo.BACKOFF_POLICY_LINEAR)
                     .setExtras(persistableBundle)
@@ -87,7 +78,7 @@ public class MainActivity extends AppCompatActivity {
                     .setRequiresCharging(false)
                     .setRequiresDeviceIdle(false);
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N){
-                builder.setPeriodic(3000, 6000);
+                builder.setPeriodic(28800000, 28800000);
             } else {
                 builder.setPeriodic(28800000);
             }
@@ -144,7 +135,7 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                if (clientes.isEmpty() == false && pesquisa.length() > 0){
+                if (!clientes.isEmpty() && pesquisa.length() > 0){
                     adapter = new ClienteAdapter(MainActivity.this, filtrar(clientes));
                     lista.setAdapter(adapter);
                 } else {
@@ -250,11 +241,12 @@ public class MainActivity extends AppCompatActivity {
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.dismiss();
                         conversoes = new Conversoes();
+                        String totalPreco = df.format(inadimplencia.getTotal()).replaceAll(Pattern.quote("."), ",");
                         String data = conversoes.calendarToString(inadimplencia.getDataFim()).replaceAll("-","/");
                         String assunto = "Referente a inadimplência";
                         String mensagem = "Caro cliente: "+ inadimplencia.getCliente().getNome() + " por meio desse E-mail " +
                                 "estamos entrando em contato com você para avisar sobre sua divida de: R$ " +
-                                df.format(inadimplencia.getTotal()) +" com data de pagamento expirada no dia: " + data +
+                                totalPreco +" com data de pagamento expirada no dia: " + data +
                                 " pedimos que compareça ao nosso estabelecimento para quitar sua divida. Atenciosamente: ";
 
                         Intent intent = new Intent(Intent.ACTION_SEND);

@@ -20,6 +20,7 @@ import com.br.clientehabitual.util.Conversoes;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.regex.Pattern;
 
 public class ClienteAdapter extends ArrayAdapter<Cliente>{
     private final Context context;
@@ -44,14 +45,14 @@ public class ClienteAdapter extends ArrayAdapter<Cliente>{
 
         textViewNome.setText(clientes.get(position).getNome());
 
-        DecimalFormat df = new DecimalFormat("#0,00");
+        DecimalFormat df = new DecimalFormat("#0.00");
         InadimplenciaDAO inadimplenciaDAO = new InadimplenciaDAO(context);
         Inadimplencia inadimplencia = inadimplenciaDAO.getInadimpleciaCliente(clientes.get(position));
-
+        String total = df.format(inadimplencia.getTotal()).replaceAll(Pattern.quote ("."), ",");
         if (inadimplencia != null){
             if (inadimplencia.isQuitada()){
-                textViewTotal.setText("Sem dividas!");
-                textViewTotal.setTextColor(Color.GREEN);
+                textViewData.setText("Sem dividas!");
+                textViewData.setTextColor(Color.GREEN);
                 textViewNome.setTextColor(Color.GREEN);
             } else if(inadimplencia.getDataFim() != null){
                 Calendar calendar = Calendar.getInstance();
@@ -59,14 +60,14 @@ public class ClienteAdapter extends ArrayAdapter<Cliente>{
                     textViewTotal.setTextColor(Color.RED);
                     textViewData.setTextColor(Color.RED);
                     textViewNome.setTextColor(Color.RED);
-                    textViewTotal.setText("R$ "+df.format(inadimplencia.getTotal()));
+                    textViewTotal.setText("R$ "+total);
                     textViewData.setText(conversoes.calendarToString(inadimplencia.getDataFim()));
                 } else {
-                    textViewTotal.setText("R$ "+df.format(inadimplencia.getTotal()));
+                    textViewTotal.setText("R$ "+total);
                     textViewData.setText(conversoes.calendarToString(inadimplencia.getDataFim()));
                 }
             } else{
-                textViewTotal.setText("R$ "+df.format(inadimplencia.getTotal()));
+                textViewTotal.setText("R$ "+total);
             }
         }
         return rowView;
