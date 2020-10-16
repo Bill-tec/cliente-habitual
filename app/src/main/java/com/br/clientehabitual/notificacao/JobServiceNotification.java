@@ -8,6 +8,7 @@ import android.app.job.JobParameters;
 import android.app.job.JobService;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -21,6 +22,7 @@ import com.br.clientehabitual.banco.daos.ClienteDAO;
 import com.br.clientehabitual.banco.daos.InadimplenciaDAO;
 import com.br.clientehabitual.models.Cliente;
 import com.br.clientehabitual.models.Inadimplencia;
+import com.br.clientehabitual.util.Conversoes;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -56,18 +58,20 @@ public class JobServiceNotification  extends JobService {
             notificationChannel.enableVibration(true);
             notificationManager.createNotificationChannel(notificationChannel);
         }
-        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_ID);
         DecimalFormat df = new DecimalFormat("#0.00");
+        Conversoes conversoes = new Conversoes();
+        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_ID);
         notificationBuilder.setAutoCancel(true)
                 .setDefaults(Notification.DEFAULT_ALL)
                 .setWhen(System.currentTimeMillis())
-                .setSmallIcon(R.drawable.ic_launcher_background)
+                .setSmallIcon(R.mipmap.ic_launcher)
+                .setLargeIcon(BitmapFactory.decodeResource(getResources(),R.drawable.cliente_habitual))
                 .setTicker("Cliente Habitual! 'Pagamentos atrazados!'")
                 .setPriority(Notification.PRIORITY_MAX)
-                .setContentTitle(inadimplencia.getCliente().getNome())
+                .setContentTitle("Pagamento atrazado: "+inadimplencia.getCliente().getNome())
                 .setContentIntent(pendingIntent)
-                .setContentInfo("R$ "+ df.format(inadimplencia.getTotal()).replaceAll(Pattern.quote("."),","))
-                .setContentText("Data para pagamento expirou!");
+                .setContentText("R$ "+ df.format(inadimplencia.getTotal()).replaceAll(Pattern.quote("."),",")
+                        + " Dia "+ conversoes.calendarToString(inadimplencia.getDataFim()));
 
         notificationManager.notify((int)inadimplencia.getCliente().getId(), notificationBuilder.build());
     }

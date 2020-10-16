@@ -26,7 +26,7 @@
         android:text="Registrar produtos"
         android:layout_centerHorizontal="true"
         android:layout_margin="10sp"
-        android:checked="true"/>
+        />
     <Button
         android:id="@+id/btnProximo"
         android:layout_below="@id/check_listar"
@@ -45,7 +45,6 @@
         android:layout_alignBottom="@+id/btnProximo"
         android:layout_toRightOf="@id/sifrao"
         android:layout_marginLeft="10sp"
-        android:visibility="invisible"
         android:inputType="numberDecimal"
         android:maxLength="6"
         />
@@ -58,15 +57,13 @@
         android:layout_alignBottom="@+id/btnProximo"
         android:layout_toRightOf="@id/popup_data_pagamento"
         android:gravity="center|end"
-        android:layout_marginLeft="10sp"
-        android:visibility="invisible"/>
+        android:layout_marginLeft="10sp"/>
     <EditText
         android:id="@+id/popup_data_pagamento"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignTop="@id/btnProximo"
         android:layout_alignBottom="@id/btnProximo"
-        android:hint="Pagamento"
-        android:visibility="invisible"
+        android:hint="DIA/MES/ANO"
         android:inputType="numberDecimal"/>
 </RelativeLayout>

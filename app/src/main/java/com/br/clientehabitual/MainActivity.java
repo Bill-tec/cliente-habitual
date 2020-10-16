@@ -72,15 +72,15 @@ public class MainActivity extends AppCompatActivity {
             ComponentName componentName = new ComponentName(this, JobServiceNotification.class);
             PersistableBundle persistableBundle = new PersistableBundle();
             JobInfo.Builder builder = new JobInfo.Builder(1, componentName)
-                    .setBackoffCriteria(28800000, JobInfo.BACKOFF_POLICY_LINEAR)
+                    .setBackoffCriteria(43200000, JobInfo.BACKOFF_POLICY_LINEAR)
                     .setExtras(persistableBundle)
                     .setPersisted(true)
                     .setRequiresCharging(false)
                     .setRequiresDeviceIdle(false);
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N){
-                builder.setPeriodic(28800000, 28800000);
+                builder.setPeriodic(43200000, 43200000);
             } else {
-                builder.setPeriodic(28800000);
+                builder.setPeriodic(43200000);
             }
             JobScheduler jobScheduler = (JobScheduler) getSystemService(Context.JOB_SCHEDULER_SERVICE);
             jobScheduler.schedule(builder.build());
@@ -194,7 +194,7 @@ public class MainActivity extends AppCompatActivity {
                     dataPagamento.setVisibility(View.VISIBLE);
                     sifrao.setVisibility(View.VISIBLE);
                     add.setText("Salvar");
-
+                }
                     add.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
@@ -229,7 +229,6 @@ public class MainActivity extends AppCompatActivity {
                             gerarListaClientes();
                         }
                     });
-                }
             }
         });
     }
