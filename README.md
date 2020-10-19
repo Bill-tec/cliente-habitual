@@ -2,7 +2,7 @@
 Trata-se de uma aplicação android para o funcionario/dono do estabelecimento gerenciar dados de vendas a longo prazo feitas por clientes proximos(amigos, vizinhos...), tendo como objetivo fornecer suporte para o controle de inadimplências em estabelecimentos comerciais chegando a tornar obsoleto o uso dos cadernos de notas.
 
 ## Caracteristicas
-- Utilizando Java como linguagem de programação, com SQLite versão 3 como banco de dados local. 
+- Utilizando Java 8 como linguagem de programação, com SQLite versão 3 como banco de dados local. 
 - SDK minimo API 20 android 4.4 (KitKat) para testes.
 
 ## Utilização
