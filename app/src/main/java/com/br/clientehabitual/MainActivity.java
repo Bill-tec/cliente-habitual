@@ -20,6 +20,7 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -34,6 +35,7 @@ import com.br.clientehabitual.util.Conversoes;
 import com.github.rtoshiro.util.format.SimpleMaskFormatter;
 import com.github.rtoshiro.util.format.pattern.MaskPattern;
 import com.github.rtoshiro.util.format.text.MaskTextWatcher;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -58,7 +60,7 @@ public class MainActivity extends AppCompatActivity {
         iniciarJobScheduler();
         gerarListaClientes();
 
-        Button novaInadimplencia = findViewById(R.id.btn_nova_inadimplencia);
+        FloatingActionButton novaInadimplencia = findViewById(R.id.btn_nova_inadimplencia);
         novaInadimplencia.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -164,9 +166,10 @@ public class MainActivity extends AppCompatActivity {
         valorpopup = (EditText)popupClienteView.findViewById(R.id.popup_cliente_valor);
         dataPagamento = (EditText)popupClienteView.findViewById(R.id.popup_data_pagamento);
 
-        final TextView sifrao = popupClienteView.findViewById(R.id.sifrao);
+        final ImageView sifrao = popupClienteView.findViewById(R.id.sifrao);
+        final ImageView calendar = popupClienteView.findViewById(R.id.calendar_icon);
 
-        add = (Button)popupClienteView.findViewById(R.id.btnProximo);
+        add = popupClienteView.findViewById(R.id.btnProximo);
 
         SimpleMaskFormatter maskData = new SimpleMaskFormatter("[0-3][0-9]/[0-1][0-9]/[0-9][0-9][0-9][0-9]");
         MaskPattern maskPattern1 = new MaskPattern("[0-1]");
@@ -186,49 +189,61 @@ public class MainActivity extends AppCompatActivity {
                     valorpopup.setVisibility(View.INVISIBLE);
                     dataPagamento.setVisibility(View.INVISIBLE);
                     sifrao.setVisibility(View.INVISIBLE);
-                    add.setText("Proximo");
+                    calendar.setVisibility(View.INVISIBLE);
+                    add.setText("PROXIMO");
                     dataPagamento.setText("");
                     valorpopup.setText("");
+                    dialog.setTitle("Novo Cliente!");
                 } else {
                     valorpopup.setVisibility(View.VISIBLE);
                     dataPagamento.setVisibility(View.VISIBLE);
                     sifrao.setVisibility(View.VISIBLE);
-                    add.setText("Salvar");
+                    calendar.setVisibility(View.VISIBLE);
+                    add.setText("SALVAR");
+                    dialog.setTitle("Nova Inadimplêcia!");
                 }
-                    add.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            Cliente cliente = new Cliente(0, nome.getText().toString().trim(),
-                                    email.getText().toString().trim());
-                            if (add.getText().toString().equals("Proximo")) {
-                                if (cliente.getNome().length() == 0) {
-                                    Toast.makeText(getApplicationContext(), "Preencha os campos, e tente novamente!", Toast.LENGTH_SHORT).show();
-                                } else {
-                                    dialog.dismiss();
-                                    Intent intent = new Intent(MainActivity.this, ClienteActivity.class);
-                                    intent.putExtra("id", Long.toString(clienteDAO.cadastrarCliente(cliente).getId()));
-                                    startActivity(intent);
-                                }
-                            } else {
-                                /* ADICIONANDO APENAS O VALOR DA INADIMPLÊCIA*/
-                                conversoes = new Conversoes();
-                                Calendar data = Calendar.getInstance();
-                                Inadimplencia inadimplencia = new Inadimplencia(0, data, conversoes.stringToCalendar(dataPagamento.getText().toString().trim().replaceAll("/", "-")),
-                                        cliente, false, Float.parseFloat(valorpopup.getText().toString().trim()));
-                                if (cliente.getNome().length() == 0 || inadimplencia.getDataFim() == null || inadimplencia.getTotal() <= 0) {
-                                    Toast.makeText(getApplicationContext(), "Preencha os campos, e tente novamente!", Toast.LENGTH_SHORT).show();
-                                } else {
-                                    dialog.dismiss();
-                                    cliente = clienteDAO.cadastrarCliente(cliente);
-                                    inadimplencia.setCliente(cliente);
-                                    inadimplencia = inadimplenciaDAO.newInadimplencia(inadimplencia);
-                                    inadimplenciaDAO.setDataPagamentoInadimplencia(inadimplencia);
-                                    Toast.makeText(getApplicationContext(), "Inadimplência registrada com sucesso!", Toast.LENGTH_LONG).show();
-                                }
-                            }
-                            gerarListaClientes();
+
+            }
+        });
+        add.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Cliente cliente = new Cliente(0, nome.getText().toString().trim(),
+                        email.getText().toString().trim());
+                if (add.getText().toString().equals("PROXIMO")) {
+                    if (cliente.getNome().length() == 0) {
+                        Toast.makeText(getApplicationContext(), "Adicione o nome do clente!", Toast.LENGTH_SHORT).show();
+                    } else {
+                        dialog.dismiss();
+                        Intent intent = new Intent(MainActivity.this, ClienteActivity.class);
+                        intent.putExtra("id", Long.toString(clienteDAO.cadastrarCliente(cliente).getId()));
+                        startActivity(intent);
+                    }
+                } else {
+                    /* ADICIONANDO APENAS O VALOR DA INADIMPLÊCIA*/
+                    conversoes = new Conversoes();
+                    Calendar data = Calendar.getInstance();
+                    Inadimplencia inadimplencia = new Inadimplencia(0, data, conversoes.stringToCalendar(dataPagamento.getText().toString().trim().replaceAll("/", "-")),
+                            cliente, false, 0);
+                    if (valorpopup.getText().toString().trim().length() != 0){
+                        if (valorpopup.getText().toString().trim().equals(".")){
+                            Toast.makeText(getApplicationContext(), "Entre com um valor valido!", Toast.LENGTH_SHORT).show();
+                        } else{
+                            inadimplencia.setTotal(Float.parseFloat(valorpopup.getText().toString().trim()));
                         }
-                    });
+                    }
+                    if (cliente.getNome().length() == 0 || inadimplencia.getDataFim() == null || inadimplencia.getTotal() <= 0) {
+                        Toast.makeText(getApplicationContext(), "Preencha os campos, e tente novamente!", Toast.LENGTH_SHORT).show();
+                    } else {
+                        dialog.dismiss();
+                        cliente = clienteDAO.cadastrarCliente(cliente);
+                        inadimplencia.setCliente(cliente);
+                        inadimplencia = inadimplenciaDAO.newInadimplencia(inadimplencia);
+                        inadimplenciaDAO.setDataPagamentoInadimplencia(inadimplencia);
+                        Toast.makeText(getApplicationContext(), "Inadimplência registrada com sucesso!", Toast.LENGTH_LONG).show();
+                    }
+                }
+                gerarListaClientes();
             }
         });
     }

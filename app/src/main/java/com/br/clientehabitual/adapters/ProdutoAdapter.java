@@ -37,12 +37,12 @@ public class ProdutoAdapter extends ArrayAdapter<Produto> {
         TextView textViewPrecoUnd = rowView.findViewById(R.id.lst_produto_preco_und);
         TextView textViewPrecoTotal = rowView.findViewById(R.id.lst_produto_preco_total);
 
-        DecimalFormat df = new DecimalFormat("#0,00");
+        DecimalFormat df = new DecimalFormat("#0.00");
 
         textViewQuantidade.setText(Integer.toString(produtos.get(position).getQuantidade()));
         textViewNome.setText(produtos.get(position).getNome());
-        textViewPrecoUnd.setText(df.format(produtos.get(position).getPreco()).replaceAll(Pattern.quote("."),","));
-        textViewPrecoTotal.setText(df.format(produtos.get(position).getQuantidade() *
+        textViewPrecoUnd.setText("R$ "+df.format(produtos.get(position).getPreco()).replaceAll(Pattern.quote("."),","));
+        textViewPrecoTotal.setText("R$ "+df.format(produtos.get(position).getQuantidade() *
                 produtos.get(position).getPreco()).replaceAll(Pattern.quote("."),","));
 
         return rowView;

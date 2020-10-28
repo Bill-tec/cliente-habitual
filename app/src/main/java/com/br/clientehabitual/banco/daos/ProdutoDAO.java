@@ -52,6 +52,12 @@ public class ProdutoDAO{
         db.delete(nomeTabela,where,null);
         db.close();
     }
+    public void deleteProdutosInad(Inadimplencia inadimplencia){
+        SQLiteDatabase db = gerenciarBanco.getReadableDatabase();
+        String where = camposTodos[1]+" = "+ inadimplencia.getId();
+        db.delete(nomeTabela,where,null);
+        db.close();
+    }
     public void updateProduto(Produto produto){
         SQLiteDatabase db = gerenciarBanco.getReadableDatabase();
         String where = camposTodos[0]+" = "+ produto.getId();

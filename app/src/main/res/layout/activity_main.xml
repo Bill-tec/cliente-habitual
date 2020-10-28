@@ -4,32 +4,83 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".MainActivity">
+    <ImageView
+        android:id="@+id/search_icon"
+        android:src="@drawable/ic_search"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@id/mainPesquisa"
+        android:layout_alignBottom="@id/mainPesquisa"
+        android:layout_marginLeft="10dp"/>
     <EditText
         android:id="@+id/mainPesquisa"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="Pesquise seu cliente..."
-        android:layout_margin="5dp"
-        android:inputType="textFilter"/>
+        android:inputType="textFilter"
+        android:layout_toRightOf="@id/search_icon"
+        android:layout_marginTop="10dp"
+        android:layout_marginRight="10dp"
+        android:maxLength="20"/>
     <ListView
         android:id="@+id/mainLista"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/mainPesquisa"
+        android:layout_below="@+id/grid_tabela"
         android:scrollbars="vertical"
         android:layout_alignParentLeft="true"
         android:layout_alignParentRight="true"
         android:layout_margin="10sp"
         android:layout_above="@id/btn_nova_inadimplencia"
         />
-    <Button
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/btn_nova_inadimplencia"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Nova inadimplência"
-        android:gravity="center"
         android:layout_alignParentBottom="true"
-        android:layout_alignParentLeft="true"
         android:layout_alignParentRight="true"
-        android:layout_margin="5sp"/>
+        android:layout_margin="5sp"
+        android:src="@drawable/ic_add"/>
+
+    <GridLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:columnCount="3"
+        android:rowCount="1"
+        android:padding="10sp"
+        android:alignmentMode="alignBounds"
+        android:layout_below="@id/mainPesquisa"
+        android:id="@+id/grid_tabela"
+        >
+        <TextView
+            android:id="@+id/nome"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            android:layout_marginLeft="12dp"
+            android:text="Cliente"
+            />
+        <TextView
+            android:id="@+id/total"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            android:layout_gravity="center|right"
+            android:layout_marginRight="45sp"
+            android:text="Divida"
+            />
+        <TextView
+            android:id="@+id/data_pagamento"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            android:layout_marginRight="12dp"
+            android:text="Pagamento"
+            />
+    </GridLayout>
+
 </RelativeLayout>

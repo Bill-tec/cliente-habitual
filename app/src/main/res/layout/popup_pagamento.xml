@@ -2,7 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent" android:layout_height="match_parent">
     <TextView
-        android:id="@+id/popup_edittext_pagamento_total"
+        android:id="@+id/popup_textview_pagamento_total"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="total"
@@ -17,19 +17,20 @@
         android:layout_height="wrap_content"
         android:inputType="numberDecimal"
         android:hint="00.00"
-        android:layout_margin="10sp"
+        android:layout_marginTop="10dp"
+        android:layout_marginRight="20dp"
         android:layout_alignParentEnd="true"
         android:maxLength="6"/>
-    <TextView
+    <ImageView
+        android:src="@drawable/ic_money_icon"
         android:id="@+id/sifrao"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:inputType="numberDecimal"
         android:layout_toLeftOf="@id/valor"
-        android:text="R$"
         android:layout_alignTop="@id/valor"
         android:layout_alignBottom="@+id/valor"
-        android:gravity="center"/>
+        />
     <TextView
         android:id="@+id/resto"
         android:layout_width="wrap_content"
@@ -44,8 +45,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Descontar"
-        android:layout_alignParentEnd="true"
         android:layout_below="@id/valor"
-        android:layout_margin="5sp"/>
+        android:layout_alignEnd="@id/valor"
+        android:layout_marginTop="10dp"/>
 
 </RelativeLayout>

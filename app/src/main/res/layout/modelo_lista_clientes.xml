@@ -9,7 +9,6 @@
             android:layout_height="wrap_content"
             android:textSize="15sp"
             android:textStyle="bold"
-            android:layout_marginRight="5sp"
             />
         <TextView
             android:id="@+id/total"

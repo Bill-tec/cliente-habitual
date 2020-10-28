@@ -48,8 +48,8 @@ public class ClienteAdapter extends ArrayAdapter<Cliente>{
         DecimalFormat df = new DecimalFormat("#0.00");
         InadimplenciaDAO inadimplenciaDAO = new InadimplenciaDAO(context);
         Inadimplencia inadimplencia = inadimplenciaDAO.getInadimpleciaCliente(clientes.get(position));
-        String total = df.format(inadimplencia.getTotal()).replaceAll(Pattern.quote ("."), ",");
         if (inadimplencia != null){
+            String total = df.format(inadimplencia.getTotal()).replaceAll(Pattern.quote ("."), ",");
             if (inadimplencia.isQuitada()){
                 textViewData.setText("Sem dividas!");
                 textViewData.setTextColor(Color.GREEN);

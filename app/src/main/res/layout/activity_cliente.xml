@@ -15,7 +15,8 @@
         android:layout_alignParentTop="true"
         android:layout_alignParentStart="true"
         android:layout_margin="5sp"
-        android:inputType="numberDecimal"/>
+        android:inputType="numberDecimal"
+        android:maxLength="3"/>
     <EditText
         android:id="@+id/produto_nome"
         android:layout_width="match_parent"
@@ -24,27 +25,28 @@
         android:layout_alignTop="@id/produto_quantidade"
         android:layout_alignBottom="@+id/produto_quantidade"
         android:layout_toRightOf="@id/produto_quantidade"
-        android:layout_toLeftOf="@id/produto_preco"
-        android:inputType="text"/>
+        android:layout_toLeftOf="@id/money_icon"
+        android:inputType="text"
+        android:maxLength="15"/>
     <EditText
         android:id="@+id/produto_preco"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:hint="00.00"
-        android:layout_toLeftOf="@id/label_sifrao"
         android:layout_alignTop="@id/produto_quantidade"
         android:layout_alignBottom="@+id/produto_quantidade"
-        android:layout_marginLeft="5sp"
-        android:inputType="numberDecimal"/>
-    <TextView
-        android:id="@+id/label_sifrao"
-        android:text="R$"
+        android:layout_alignParentRight="true"
+        android:inputType="numberDecimal"
+        android:maxLength="8"/>
+
+    <ImageView
+        android:src="@drawable/ic_money_icon"
+        android:id="@+id/money_icon"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
         android:layout_alignBottom="@id/produto_quantidade"
         android:layout_alignTop="@id/produto_quantidade"
-        android:gravity="center"/>
+        android:layout_toLeftOf="@id/produto_preco"/>
     <Button
         android:id="@+id/btn_add"
         android:text="Adicionar"
@@ -73,15 +75,16 @@
         android:layout_toLeftOf="@id/btn_limpar"
         android:layout_alignParentLeft="true"
         android:textStyle="bold"/>
+
     <ListView
         android:id="@+id/lst_produtos"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_above="@id/data_incio"
-        android:scrollbars="vertical"
-        android:layout_below="@id/btn_limpar"
-        android:layout_margin="10sp"
-        />
+        android:layout_below="@id/grid_tabela"
+        android:layout_margin="10dp"
+        android:scrollbars="vertical" />
+
     <TextView
         android:id="@+id/data_incio"
         android:layout_width="wrap_content"
@@ -111,5 +114,46 @@
         android:hint="Pagamento"
         android:gravity="center"
         />
+    <GridLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:columnCount="4"
+        android:rowCount="1"
+        android:padding="10sp"
+        android:alignmentMode="alignBounds"
+        android:layout_below="@id/btn_limpar"
+        android:id="@+id/grid_tabela">
+        <TextView
+            android:id="@+id/lst_produto_qtd"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="QTD"
+            android:textStyle="bold"/>
+        <TextView
+            android:id="@+id/lst_produto_nome"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="NOME"
+            android:layout_marginLeft="15sp"
+            android:textStyle="bold"/>
+        <TextView
+            android:id="@+id/lst_produto_preco_und"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="PREÇO_UND"
+            android:layout_gravity="center|right"
+            android:layout_marginRight="20dp"
+            android:textStyle="bold"
+            />
+        <TextView
+            android:id="@+id/lst_produto_preco_total"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="TOTAL"
+            android:textStyle="bold"
+            android:layout_marginRight="10dp"/>
+
+    </GridLayout>
 
 </RelativeLayout>

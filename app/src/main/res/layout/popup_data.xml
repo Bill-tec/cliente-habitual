@@ -1,13 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent" android:layout_height="match_parent">
+    <ImageView
+        android:src="@drawable/ic_calendar_icon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toLeftOf="@id/popup_data_edittext"
+        android:layout_alignTop="@id/popup_data_edittext"
+        android:layout_alignBottom="@id/popup_data_edittext"/>
     <EditText
         android:id="@+id/popup_data_edittext"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:hint="DIA/MÊS/ANO"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="5sp"
+        android:layout_marginTop="15sp"
         android:inputType="numberDecimal"/>
     <Button
         android:id="@+id/btn_pupup_data_dalvar"

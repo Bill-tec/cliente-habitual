@@ -2,9 +2,19 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
-        android:id="@+id/inadimplencia_baixa"
-        android:title="Dar baixa"
-        app:showAsAction="never"/>
+        android:id="@+id/inadimplencia"
+        android:title="Inadimplência"
+        app:showAsAction="never">
+        <menu>
+            <item
+                android:id="@+id/sub_baixa"
+                android:title="Baixa parcial"/>
+            <item
+                android:id="@+id/sub_quitar"
+                android:title="Quitar"/>
+        </menu>
+
+    </item>
     <item
         android:id="@+id/item_cliente"
         android:title="Cliente"

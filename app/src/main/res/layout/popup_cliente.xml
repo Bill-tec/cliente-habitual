@@ -2,6 +2,28 @@
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
     android:layout_height="match_parent">
+    <ImageView
+        android:id="@+id/user_icon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_user"
+        android:layout_alignTop="@id/popupNome"
+        android:layout_alignBottom="@id/popupNome"/>
+    <ImageView
+        android:id="@+id/email_icon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_email_icon"
+        android:layout_alignTop="@id/popupEmail"
+        android:layout_alignBottom="@id/popupEmail"/>
+    <ImageView
+        android:id="@+id/calendar_icon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_calendar_icon"
+        android:layout_alignTop="@id/popup_data_pagamento"
+        android:layout_alignBottom="@id/popup_data_pagamento"
+        />
 
     <EditText
         android:layout_width="match_parent"
@@ -9,14 +31,16 @@
         android:id="@+id/popupNome"
         android:hint="Nome"
         android:layout_marginTop="10sp"
-        />
+        android:layout_toRightOf="@id/user_icon"
+        android:maxLength="15"/>
     <EditText
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/popupEmail"
         android:hint="E-mail"
-        android:layout_below="@id/popupNome"
+        android:layout_toRightOf="@id/email_icon"
         android:inputType="textEmailAddress"
+        android:layout_below="@id/user_icon"
         />
     <CheckBox
         android:layout_below="@+id/popupEmail"
@@ -29,10 +53,10 @@
         />
     <Button
         android:id="@+id/btnProximo"
-        android:layout_below="@id/check_listar"
+        android:layout_below="@id/popup_data_pagamento"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Proximo"
+        android:text="Salvar"
         android:layout_alignParentRight="true"
         android:layout_margin="10sp"
         />
@@ -41,29 +65,28 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:hint="00.00"
-        android:layout_alignTop="@+id/btnProximo"
-        android:layout_alignBottom="@+id/btnProximo"
+        android:layout_alignTop="@id/calendar_icon"
+        android:layout_alignBottom="@id/calendar_icon"
         android:layout_toRightOf="@id/sifrao"
-        android:layout_marginLeft="10sp"
         android:inputType="numberDecimal"
-        android:maxLength="6"
+        android:maxLength="8"
         />
-    <TextView
+    <ImageView
+        android:src="@drawable/ic_money_icon"
         android:id="@+id/sifrao"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="R$"
-        android:layout_alignTop="@+id/btnProximo"
-        android:layout_alignBottom="@+id/btnProximo"
+        android:layout_alignTop="@id/calendar_icon"
+        android:layout_alignBottom="@id/calendar_icon"
         android:layout_toRightOf="@id/popup_data_pagamento"
-        android:gravity="center|end"
-        android:layout_marginLeft="10sp"/>
+        android:layout_marginLeft="15sp"/>
     <EditText
         android:id="@+id/popup_data_pagamento"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignTop="@id/btnProximo"
-        android:layout_alignBottom="@id/btnProximo"
+        android:layout_below="@id/check_listar"
         android:hint="DIA/MES/ANO"
-        android:inputType="numberDecimal"/>
+        android:inputType="numberDecimal"
+        android:gravity="center"
+        android:layout_toRightOf="@id/calendar_icon"/>
 </RelativeLayout>

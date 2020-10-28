@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <ImageView
+        android:id="@+id/user_icon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_user"
+        android:layout_alignTop="@id/popupNome"
+        android:layout_alignBottom="@id/popupNome" />
+    <ImageView
+        android:id="@+id/email_icon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_email_icon"
+        android:layout_alignTop="@id/popupEmail"
+        android:layout_alignBottom="@id/popupEmail"/>
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/popupNome"
+        android:hint="Nome"
+        android:layout_marginTop="25sp"
+        android:layout_toRightOf="@id/user_icon"
+        android:maxLength="15"/>
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/popupEmail"
+        android:hint="E-mail"
+        android:layout_toRightOf="@id/email_icon"
+        android:inputType="textEmailAddress"
+        android:layout_below="@id/user_icon"
+        />
+
+    <Button
+        android:id="@+id/btnProximo"
+        android:layout_below="@id/popupEmail"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Salvar"
+        android:layout_alignParentRight="true"
+        android:layout_margin="10sp"
+        />
+
+</RelativeLayout>

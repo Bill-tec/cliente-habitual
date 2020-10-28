@@ -19,25 +19,26 @@
         android:hint="Produto..."
         android:layout_alignTop="@id/popup_produto_quantidade"
         android:layout_toRightOf="@id/popup_produto_quantidade"
-        android:layout_toLeftOf="@id/popup_produto_preco"/>
+        android:layout_toLeftOf="@id/money_icon"
+        android:maxLength="15"/>
     <EditText
         android:id="@+id/popup_produto_preco"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:hint="00.00"
-        android:layout_toLeftOf="@id/label_sifrao"
         android:layout_alignTop="@id/popup_produto_quantidade"
-        android:layout_marginLeft="5sp"/>
-    <TextView
-        android:id="@+id/label_sifrao"
-        android:text="R$"
+        android:layout_alignParentRight="true"
+        android:maxLength="8"/>
+    <ImageView
+        android:id="@+id/money_icon"
+        android:src="@drawable/ic_money_icon"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
         android:layout_alignBottom="@id/popup_produto_quantidade"
         android:layout_alignTop="@id/popup_produto_quantidade"
-        android:gravity="center"
-        android:layout_marginEnd="5sp"/>
+        android:layout_toLeftOf="@id/popup_produto_preco"
+        android:layout_marginLeft="5sp"
+        />
     <Button
         android:id="@+id/popup_produto_btn_remover"
         android:text="Deletar"
