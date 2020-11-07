@@ -16,18 +16,19 @@ import android.os.PersistableBundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
+import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.br.clientehabitual.adapters.ClienteAdapter;
 import com.br.clientehabitual.banco.daos.ClienteDAO;
 import com.br.clientehabitual.banco.daos.InadimplenciaDAO;
+import com.br.clientehabitual.banco.daos.ProdutoDAO;
 import com.br.clientehabitual.models.Cliente;
 import com.br.clientehabitual.models.Inadimplencia;
 import com.br.clientehabitual.notificacao.JobServiceNotification;
@@ -58,13 +59,26 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         iniciarJobScheduler();
-        gerarListaClientes();
 
-        FloatingActionButton novaInadimplencia = findViewById(R.id.btn_nova_inadimplencia);
+        gerarListaClientes();
+        final FloatingActionButton novaInadimplencia = findViewById(R.id.btn_nova_inadimplencia);
         novaInadimplencia.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 popupNovoCliente();
+            }
+        });
+        lista.setOnScrollListener(new AbsListView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(AbsListView view, int scrollState) { }
+
+            @Override
+            public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+                if (firstVisibleItem > 0){
+                    novaInadimplencia.hide();
+                } else {
+                    novaInadimplencia.show();
+                }
             }
         });
 
@@ -106,10 +120,18 @@ public class MainActivity extends AppCompatActivity {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Inadimplencia inadimplencia = inadimplenciaDAO.getInadimpleciaCliente(clientes.get(position));
                 if (inadimplencia != null){
+                    Intent intent;
                     Calendar calendar = Calendar.getInstance();
-                    if (inadimplencia.getDataFim() ==  null){
-                        Intent intent = new Intent(MainActivity.this, ClienteActivity.class);
+                    // DEFINIR QUAL TELA ABRIR DE ACORDO COM A LISTA DE PRODUTOS
+                    ProdutoDAO produtoDAO = new ProdutoDAO(MainActivity.this);
+                    if (produtoDAO.listProdutosInad(inadimplencia).isEmpty()){
+                        intent = new Intent(MainActivity.this, ActivityInadimplencia.class);
                         intent.putExtra("id",Long.toString(clientes.get(position).getId()));
+                    } else{
+                        intent = new Intent(MainActivity.this, ProdutosActivity.class);
+                        intent.putExtra("id",Long.toString(clientes.get(position).getId()));
+                    }//ATE AQUI!!!!!!!!!!
+                    if (inadimplencia.getDataFim() ==  null){
                         startActivity(intent);
                     }
                     else if (calendar.getTime().after(inadimplencia.getDataFim().getTime()) && inadimplencia.isQuitada() == false){
@@ -118,12 +140,10 @@ public class MainActivity extends AppCompatActivity {
                         }
                             emailConfirm(inadimplencia);
                     } else {
-                        Intent intent = new Intent(MainActivity.this, ClienteActivity.class);
-                        intent.putExtra("id",Long.toString(clientes.get(position).getId()));
                         startActivity(intent);
                     }
                 } else{
-                        Intent intent = new Intent(MainActivity.this, ClienteActivity.class);
+                        Intent intent = new Intent(MainActivity.this, ProdutosActivity.class);
                         intent.putExtra("id",Long.toString(clientes.get(position).getId()));
                         startActivity(intent);
                 }
@@ -215,7 +235,7 @@ public class MainActivity extends AppCompatActivity {
                         Toast.makeText(getApplicationContext(), "Adicione o nome do clente!", Toast.LENGTH_SHORT).show();
                     } else {
                         dialog.dismiss();
-                        Intent intent = new Intent(MainActivity.this, ClienteActivity.class);
+                        Intent intent = new Intent(MainActivity.this, ProdutosActivity.class);
                         intent.putExtra("id", Long.toString(clienteDAO.cadastrarCliente(cliente).getId()));
                         startActivity(intent);
                     }
@@ -284,7 +304,7 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.dismiss();
-                        Intent intent = new Intent(MainActivity.this, ClienteActivity.class);
+                        Intent intent = new Intent(MainActivity.this, ProdutosActivity.class);
                         intent.putExtra("id",Long.toString(inadimplencia.getCliente().getId()));
                         startActivity(intent);
                     }

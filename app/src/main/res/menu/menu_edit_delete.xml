@@ -2,31 +2,7 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
-        android:id="@+id/inadimplencia"
-        android:title="Inadimplência"
-        app:showAsAction="never">
-        <menu>
-            <item
-                android:id="@+id/sub_baixa"
-                android:title="Baixa parcial"/>
-            <item
-                android:id="@+id/sub_quitar"
-                android:title="Quitar"/>
-        </menu>
-
-    </item>
-    <item
-        android:id="@+id/item_cliente"
-        android:title="Cliente"
-        app:showAsAction="never">
-        <menu>
-            <item
-                android:id="@+id/sub_cliente_editar"
-                android:title="Editar"/>
-            <item
-                android:id="@+id/sub_cliente_delete"
-                android:title="Remover"/>
-        </menu>
-    </item>
-
+        android:id="@+id/menu_cliente_delete"
+        app:showAsAction="never"
+        android:title="Deletar cliente"/>
 </menu>

@@ -3,7 +3,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ClienteActivity">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context=".ProdutosActivity">
     <EditText
         android:id="@+id/produto_quantidade"
         android:layout_width="wrap_content"
@@ -75,45 +76,51 @@
         android:layout_toLeftOf="@id/btn_limpar"
         android:layout_alignParentLeft="true"
         android:textStyle="bold"/>
+    <TableLayout
+        android:id="@+id/table_datas"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:stretchColumns="*"
+        android:shrinkColumns="*"
+        android:orientation="horizontal"
+        android:background="#000000"
+        android:layout_alignParentBottom="true">
+    <TableRow
+        android:background="#000000"
+        android:layout_margin="2dp"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        >
+        <TextView
+            android:id="@+id/data_incio"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAlignment="center"
+            android:textSize="20dp"
+            android:background="#f8f8ff"
+            android:textColor="#000000"
+            android:layout_margin="2dp"/>
+        <TextView
+            android:id="@+id/data_pagamento"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAlignment="center"
+            android:textSize="20dp"
+            android:layout_margin="2dp"
+            android:background="#f8f8ff"
+            android:textColor="#000000"
+            android:text="Pagamento"/>
+    </TableRow>
+    </TableLayout>
 
     <ListView
         android:id="@+id/lst_produtos"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_above="@id/data_incio"
         android:layout_below="@id/grid_tabela"
         android:layout_margin="10dp"
-        android:scrollbars="vertical" />
-
-    <TextView
-        android:id="@+id/data_incio"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="datainicio"
-        android:layout_alignTop="@id/data_pagamento"
-        android:layout_alignBottom="@id/data_pagamento"
-        android:layout_alignParentLeft="true"
-        android:gravity="center"
-        android:layout_toLeftOf="@id/divisoria"/>
-    <TextView
-        android:id="@+id/divisoria"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:layout_alignParentBottom="true"
-        android:layout_marginBottom="10sp"/>
-
-    <TextView
-        android:id="@+id/data_pagamento"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_toRightOf="@id/divisoria"
-        android:layout_alignParentRight="true"
-        android:layout_alignTop="@id/divisoria"
-        android:hint="Pagamento"
-        android:gravity="center"
-        />
+        android:scrollbars="vertical"
+        android:layout_above="@id/table_datas"/>
     <GridLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -155,5 +162,79 @@
             android:layout_marginRight="10dp"/>
 
     </GridLayout>
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fab_menu_expand"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_add"
+        android:layout_alignBottom="@id/lst_produtos"
+        android:layout_alignEnd="@id/lst_produtos"/>
 
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fab_baixa"
+        android:src="@drawable/ic_money_ic2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:layout_alignRight="@+id/fab_menu_expand"
+        android:layout_above="@id/fab_menu_expand"
+        app:fabSize="mini"
+        android:visibility="invisible"
+        />
+    <TextView
+        android:id="@+id/title_baixa"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Dar baixa!"
+        android:layout_toLeftOf="@+id/fab_baixa"
+        android:layout_alignTop="@id/fab_baixa"
+        android:layout_alignBottom="@id/fab_baixa"
+        android:gravity="center"
+        android:textColor="#000000"
+        android:visibility="invisible"/>
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:src="@drawable/ic_check"
+        android:id="@+id/fab_quitar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignRight="@+id/fab_baixa"
+        android:layout_above="@id/fab_baixa"
+        app:fabSize="mini"
+        android:visibility="invisible"
+    />
+    <TextView
+        android:id="@+id/title_quitar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Quitar!"
+        android:layout_toLeftOf="@+id/fab_quitar"
+        android:layout_alignTop="@id/fab_quitar"
+        android:layout_alignBottom="@id/fab_quitar"
+        android:layout_alignEnd="@id/title_baixa"
+        android:gravity="center"
+        android:textColor="#000000"
+        android:visibility="invisible"/>
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:src="@drawable/ic_edit"
+        android:id="@+id/fab_cliente_edit"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignRight="@+id/fab_baixa"
+        android:layout_above="@id/fab_quitar"
+        android:layout_marginBottom="10dp"
+        app:fabSize="mini"
+        android:visibility="invisible"
+        />
+    <TextView
+        android:id="@+id/title_edit_cliente"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Editar cliente!"
+        android:layout_toLeftOf="@+id/fab_cliente_edit"
+        android:layout_alignTop="@id/fab_cliente_edit"
+        android:layout_alignBottom="@id/fab_cliente_edit"
+        android:layout_alignEnd="@id/title_baixa"
+        android:gravity="center"
+        android:textColor="#000000"
+        android:visibility="invisible"/>
 </RelativeLayout>

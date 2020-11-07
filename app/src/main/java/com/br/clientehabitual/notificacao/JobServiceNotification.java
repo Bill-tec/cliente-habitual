@@ -66,7 +66,7 @@ public class JobServiceNotification  extends JobService {
                 .setWhen(System.currentTimeMillis())
                 .setSmallIcon(R.mipmap.ic_launcher)
                 .setLargeIcon(BitmapFactory.decodeResource(getResources(),R.drawable.cliente_habitual))
-                .setTicker("Cliente Habitual! 'Pagamentos atrazados!'")
+                .setTicker("Cliente Habitual! 'Pagamentos atrasados!'")
                 .setPriority(Notification.PRIORITY_MAX)
                 .setContentTitle("Pagamento atrazado: "+inadimplencia.getCliente().getNome())
                 .setContentIntent(pendingIntent)

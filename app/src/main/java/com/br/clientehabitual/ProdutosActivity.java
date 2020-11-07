@@ -14,10 +14,10 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -34,34 +34,37 @@ import com.br.clientehabitual.util.Conversoes;
 import com.github.rtoshiro.util.format.SimpleMaskFormatter;
 import com.github.rtoshiro.util.format.pattern.MaskPattern;
 import com.github.rtoshiro.util.format.text.MaskTextWatcher;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.text.DecimalFormat;
 import java.util.Calendar;
 import java.util.regex.Pattern;
 
-public class ClienteActivity extends AppCompatActivity {
+public class ProdutosActivity extends AppCompatActivity {
     private EditText nome, email,preco, quantidade, date;
     private Button adicionar, limpar;
-    private TextView total, dataInicio,textViewdataPagamento;
-    private Cliente cliente;
+    private FloatingActionButton fab_baixa, fab_quitar, fab_edit, fab_expand;
+    private TextView total, dataInicio,textViewdataPagamento,quit,baixa,edit;
     private ClienteDAO clienteDAO = new ClienteDAO(this);
     private ProdutoDAO produtoDAO = new ProdutoDAO(this);
-    private Inadimplencia inadimplencia;
     private InadimplenciaDAO inadimplenciaDAO = new InadimplenciaDAO(this);
+    private Cliente cliente;
+    private Inadimplencia inadimplencia;
     private DecimalFormat df = new DecimalFormat("#0.00");
+    private ListView lista;
+    private boolean visivel = false;
 
     private Conversoes converter = new Conversoes();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_cliente);
+        setContentView(R.layout.activity_produtos);
 
         Intent intent = getIntent();
         int id = Integer.parseInt(intent.getStringExtra("id"));
         cliente = new Cliente(id,"","");
         cliente = clienteDAO.getClienteId(cliente);
         setTitle(cliente.getNome());
-
 
         inadimplencia = inadimplenciaDAO.getInadimpleciaCliente(cliente);
         if (inadimplencia != null) {
@@ -72,7 +75,6 @@ public class ClienteActivity extends AppCompatActivity {
                 textViewdataPagamento.setText(converter.calendarToString(inadimplencia.getDataFim()).replaceAll("-","/"));
             }
         }
-        gerarListaProdutos();
 
         textViewdataPagamento = (TextView) findViewById(R.id.data_pagamento);
         textViewdataPagamento.setOnClickListener(new View.OnClickListener() {
@@ -81,6 +83,73 @@ public class ClienteActivity extends AppCompatActivity {
                 dataPagamentoPopUp();
             }
         });
+
+        /** ####MENU BOTÃO FLUTUANTE #####*/
+
+        fab_baixa = findViewById(R.id.fab_baixa);
+        fab_baixa.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                hideShowMenuFab();
+                popupBaixaInadimplencia();
+            }
+        });
+        fab_quitar = findViewById(R.id.fab_quitar);
+        fab_quitar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                hideShowMenuFab();
+                confirmQuitInadimplencia();
+            }
+        });
+        fab_edit = findViewById(R.id.fab_cliente_edit);
+        fab_edit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                hideShowMenuFab();
+                popupAtualizarCliente();
+            }
+        });
+
+        edit = findViewById(R.id.title_edit_cliente);
+        baixa = findViewById(R.id.title_baixa);
+        quit = findViewById(R.id.title_quitar);
+
+        fab_expand = findViewById(R.id.fab_menu_expand);
+        fab_expand.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                hideShowMenuFab();
+            }
+        });
+
+        lista = findViewById(R.id.lst_produtos);
+        lista.setOnScrollListener(new AbsListView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(AbsListView view, int scrollState) {
+
+            }
+
+            @Override
+            public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+                if (firstVisibleItem > 0){
+                    fab_expand.hide();
+                    fab_baixa.hide();
+                    fab_edit.hide();
+                    fab_quitar.hide();
+                    visivel = false;
+                    edit.setVisibility(View.INVISIBLE);
+                    baixa.setVisibility(View.INVISIBLE);
+                    quit.setVisibility(View.INVISIBLE);
+                } else {
+                    fab_expand.show();
+                }
+            }
+        });
+
+        //* #### FIM MENU BOTÕES FLUTUANTES ####*/
+
+        gerarListaProdutos();
 
         adicionar = findViewById(R.id.btn_add);
         adicionar.setOnClickListener(new View.OnClickListener() {
@@ -152,10 +221,7 @@ public class ClienteActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch(item.getItemId()) {
-            case R.id.sub_cliente_editar:
-                popupAtualizarCliente();
-                return true;
-            case R.id.sub_cliente_delete:
+            case R.id.menu_cliente_delete:
                 if (inadimplencia == null){
                     confirmDeleteCliente();
                 }
@@ -165,15 +231,31 @@ public class ClienteActivity extends AppCompatActivity {
                     confirmDeleteCliente();
                 }
                 return true;
-            case R.id.sub_baixa:
-                popupBaixaInadimplencia();
-                return true;
-            case R.id.sub_quitar:
-                confirmQuitInadimplencia();
-                return true;
         }
         return super.onOptionsItemSelected(item);
     }
+    public void hideShowMenuFab(){
+        if (visivel == true){
+            fab_expand.setImageResource(R.drawable.ic_add);
+            fab_baixa.hide();
+            fab_edit.hide();
+            fab_quitar.hide();
+            visivel = false;
+            edit.setVisibility(View.INVISIBLE);
+            baixa.setVisibility(View.INVISIBLE);
+            quit.setVisibility(View.INVISIBLE);
+        } else{
+            fab_expand.setImageResource(R.drawable.ic_close);
+            fab_baixa.show();
+            fab_edit.show();
+            fab_quitar.show();
+            visivel = true;
+            edit.setVisibility(View.VISIBLE);
+            baixa.setVisibility(View.VISIBLE);
+            quit.setVisibility(View.VISIBLE);
+        }
+    }
+
     public void popupAtualizarCliente(){
         AlertDialog.Builder dialogBuilder;
         final AlertDialog dialog;
@@ -215,7 +297,6 @@ public class ClienteActivity extends AppCompatActivity {
     }
     public void gerarListaProdutos(){
         if (inadimplencia != null){
-            ListView lista = findViewById(R.id.lst_produtos);
 
             dataInicio = (TextView) findViewById(R.id.data_incio);
             dataInicio.setText(converter.calendarToString(inadimplencia.getDataInicio()).replaceAll("-","/"));
@@ -318,7 +399,7 @@ public class ClienteActivity extends AppCompatActivity {
         dialog.setTitle("Baixa");
         dialog.show();
 
-        TextView total = popupPagamentoView.findViewById(R.id.popup_textview_pagamento_total);
+        final TextView total = popupPagamentoView.findViewById(R.id.popup_textview_pagamento_total);
 
         total.setText(df.format(inadimplencia.getTotal()) +"R$");
 
@@ -328,8 +409,8 @@ public class ClienteActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if (descontar.getText().equals("Descontar")){
-                    inadimplenciaDAO.setValorTotal(inadimplencia);
                     inadimplencia.setTotal(inadimplencia.getTotal() - Float.parseFloat(preco.getText().toString().trim()));
+                    inadimplenciaDAO.setValorTotal(inadimplencia);
                     Toast.makeText(getApplicationContext(),"Valor descontado com sucesso!",Toast.LENGTH_SHORT).show();
                 } else {
                     inadimplencia.setQuitada(true);
@@ -338,6 +419,7 @@ public class ClienteActivity extends AppCompatActivity {
                     textViewdataPagamento.setText("");
                 }
                 dialog.dismiss();
+                gerarListaProdutos();
             }
         });
 
@@ -384,7 +466,7 @@ public class ClienteActivity extends AppCompatActivity {
                         inadimplenciaDAO.deleteInadimplencia(inadimplencia);
                         clienteDAO.deleteCliente(cliente);
                         Toast.makeText(getApplicationContext(),"Cliente removido com sucesso!",Toast.LENGTH_SHORT).show();
-                        Intent intent = new Intent(ClienteActivity.this,MainActivity.class);
+                        Intent intent = new Intent(ProdutosActivity.this,MainActivity.class);
                         startActivity(intent);
                     }
 
@@ -421,17 +503,14 @@ public class ClienteActivity extends AppCompatActivity {
                 .setPositiveButton("Sim", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        Calendar data = Calendar.getInstance();
-                        produtoDAO.deleteProdutosInad(inadimplencia);
-                        inadimplenciaDAO.deleteInadimplencia(inadimplencia);
-                        inadimplencia = new Inadimplencia(0,data, null,cliente, false,
-                                produto.getQuantidade() * produto.getPreco());
-                        inadimplencia = inadimplenciaDAO.newInadimplencia(inadimplencia);
-                        produtoDAO.addProduto(inadimplencia.getId(),produto);
+                        produtoDAO.deleteProdutoId(produto);
+                        inadimplencia.setTotal(inadimplencia.getTotal() - (produto.getQuantidade() * produto.getPreco()));
+                        inadimplenciaDAO.setValorTotal(inadimplencia);
                         quantidade.setText("1");
                         nome.setText("");
                         preco.setText("");
                         dialog.dismiss();
+                        dialogProduto.dismiss();
                         gerarListaProdutos();
                     }
 
@@ -440,6 +519,7 @@ public class ClienteActivity extends AppCompatActivity {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.dismiss();
+                        dialogProduto.dismiss();
                     }
                 }).show();
     }
