@@ -68,15 +68,15 @@ public class ProdutosActivity extends AppCompatActivity {
 
         inadimplencia = inadimplenciaDAO.getInadimpleciaCliente(cliente);
         if (inadimplencia != null) {
-            dataInicio = (TextView) findViewById(R.id.data_incio);
+            dataInicio = findViewById(R.id.data_incio);
             dataInicio.setText(converter.calendarToString(inadimplencia.getDataInicio()).replaceAll("-","/"));
             if (inadimplencia.getDataFim() != null){
-                textViewdataPagamento = (TextView)findViewById(R.id.data_pagamento);
+                textViewdataPagamento = findViewById(R.id.data_pagamento);
                 textViewdataPagamento.setText(converter.calendarToString(inadimplencia.getDataFim()).replaceAll("-","/"));
             }
         }
 
-        textViewdataPagamento = (TextView) findViewById(R.id.data_pagamento);
+        textViewdataPagamento = findViewById(R.id.data_pagamento);
         textViewdataPagamento.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

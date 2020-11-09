@@ -326,11 +326,12 @@ public class MainActivity extends AppCompatActivity {
         clientes = clienteDAO.listaClientes();
         ArrayList<Cliente> organizado = new ArrayList<>();
         ArrayList<Cliente> emDia = new ArrayList<>();
+        ArrayList<Cliente> quitada = new ArrayList<>();
         for (Cliente c : clientes){
             Inadimplencia inadimplencia = inadimplenciaDAO.getInadimpleciaCliente(c);
             if (inadimplencia != null){
                 if (inadimplencia.isQuitada()){
-                    emDia.add(c);
+                    quitada.add(c);
                 } else{
                     if(inadimplencia.getDataFim() != null){
                         Calendar calendar = Calendar.getInstance();
@@ -339,13 +340,18 @@ public class MainActivity extends AppCompatActivity {
                         } else{
                             emDia.add(c);
                         }
+                    } else{
+                        emDia.add(c);
                     }
                 }
             } else{
                 emDia.add(c);
             }
         }
+        organizado.addAll(quitada);
         organizado.addAll(emDia);
+        quitada.clear();
+        emDia.clear();
         return organizado;
     }
 }

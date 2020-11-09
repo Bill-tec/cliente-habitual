@@ -67,7 +67,10 @@ public class ClienteAdapter extends ArrayAdapter<Cliente>{
                     textViewData.setText(conversoes.calendarToString(inadimplencia.getDataFim()));
                 }
             } else{
-                textViewTotal.setText("R$ "+total);
+                if (inadimplencia.getTotal() > 0){
+                    textViewTotal.setText("R$ "+total);
+                }
+                textViewData.setText("SEM DATA");
             }
         }
         return rowView;

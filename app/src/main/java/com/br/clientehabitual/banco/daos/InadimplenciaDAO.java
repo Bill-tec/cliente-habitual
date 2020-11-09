@@ -38,10 +38,11 @@ public class InadimplenciaDAO {
         Cursor cursor = db.query(nomeTabela, campos,where, null,null,null,null);
         if (cursor.moveToNext()) {
             inadimplencia = new Inadimplencia(cursor.getLong(0),converter.stringToCalendar(
-                    cursor.getString(1)) , converter.stringToCalendar(cursor.getString(2)),
-                    cliente, false, cursor.getFloat(5));
+                    cursor.getString(1)) , null, cliente, false, cursor.getFloat(5));
             if (cursor.getInt(4) == 1){
                 inadimplencia.setQuitada(true);
+            }if (cursor.getString(2) != null){
+                inadimplencia.setDataFim(converter.stringToCalendar(cursor.getString(2)));
             }
         }
         return inadimplencia;

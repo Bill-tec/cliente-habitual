@@ -10,6 +10,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RadioButton;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -59,15 +60,17 @@ public class ActivityInadimplencia extends AppCompatActivity {
 
 
         inadimplencia = inadimplenciaDAO.getInadimpleciaCliente(cliente);
+        txt_pagamento = findViewById(R.id.data_pagamento);
         if (inadimplencia != null) {
             txt_total = findViewById(R.id.total_inadimplencia);
-            txt_total.setText("R$ "+df.format(inadimplencia.getTotal()));
+            if (inadimplencia.getTotal() > 0){
+                txt_total.setText("R$ "+df.format(inadimplencia.getTotal()));
+            }
 
             txt_inicio = findViewById(R.id.data_inicio);
-            txt_inicio.setText(converter.calendarToString(inadimplencia.getDataInicio()).replaceAll("-","/"));
+            txt_inicio.setText(converter.calendarToString(inadimplencia.getDataInicio()));
             if (inadimplencia.getDataFim() != null){
-                txt_pagamento = findViewById(R.id.data_pagamento);
-                txt_pagamento.setText(converter.calendarToString(inadimplencia.getDataFim()).replaceAll("-","/"));
+                txt_pagamento.setText(converter.calendarToString(inadimplencia.getDataFim()));
                 if (inadimplencia.isQuitada()){
                     txt_total.setTextColor(Color.GREEN);
                 } else {
@@ -91,23 +94,29 @@ public class ActivityInadimplencia extends AppCompatActivity {
             public void onClick(View v) {
                 RadioButton radioButton_acres = findViewById(R.id.RB_acrescentar);
                 if (edt_valor.getText().toString().trim().length() > 0){
-                    if (radioButton_acres.isChecked()){
+                    if (edt_valor.getText().toString().trim().equals(".")){
+                        Toast.makeText(getApplicationContext(),"Insira um valor",Toast.LENGTH_SHORT).show();
+                    }
+                    else if (radioButton_acres.isChecked()){
                         inadimplencia.setTotal(inadimplencia.getTotal() + Float.parseFloat(edt_valor.getText().toString().trim()));
                         inadimplenciaDAO.setValorTotal(inadimplencia);
                         txt_total.setText("R$ "+df.format(inadimplencia.getTotal()));
+                        edt_valor.setText("");
+                    } else{
+                        if (inadimplencia.getTotal() <= Float.parseFloat(edt_valor.getText().toString().trim())){
+                            Toast.makeText(getApplicationContext(), "Inadimplência quitada!",Toast.LENGTH_SHORT).show();
+                            txt_total.setText("Troco R$ "+ (Float.parseFloat(edt_valor.getText().toString().trim()) - inadimplencia.getTotal()));
+                            txt_total.setTextColor(Color.GREEN);
+                            inadimplencia.setQuitada(true);
+                            inadimplenciaDAO.setQuitInadimplencia(inadimplencia);
+                        } else {
+                            inadimplencia.setTotal(inadimplencia.getTotal() - Float.parseFloat(edt_valor.getText().toString().trim()));
+                            inadimplenciaDAO.setValorTotal(inadimplencia);
+                            txt_total.setText("R$ "+df.format(inadimplencia.getTotal()));
+                        }
                     }
                 } else {
-                    if (inadimplencia.getTotal() >= Float.parseFloat(edt_valor.getText().toString().trim())){
-                        Toast.makeText(getApplicationContext(), "Inadimplência quitada!",Toast.LENGTH_SHORT).show();
-                        txt_total.setText("Troco R$ "+ (Float.parseFloat(edt_valor.getText().toString().trim()) - inadimplencia.getTotal()));
-                        txt_total.setTextColor(Color.GREEN);
-                        inadimplencia.setQuitada(true);
-                        inadimplenciaDAO.setQuitInadimplencia(inadimplencia);
-                    } else {
-                        inadimplencia.setTotal(inadimplencia.getTotal() - Float.parseFloat(edt_valor.getText().toString().trim()));
-                        inadimplenciaDAO.setValorTotal(inadimplencia);
-                        txt_total.setText("R$ "+df.format(inadimplencia.getTotal()));
-                    }
+                    Toast.makeText(getApplicationContext(),"Insira um valor",Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -119,6 +128,9 @@ public class ActivityInadimplencia extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 hideShowMenuFab();
+                if (!inadimplencia.isQuitada()){
+                    Toast.makeText(getApplicationContext(),"ATENÇÃO! A inadimplência ainda esta ativa", Toast.LENGTH_LONG).show();
+                }
                 confirmNovaInadimplencia();
             }
         });
@@ -266,9 +278,9 @@ public class ActivityInadimplencia extends AppCompatActivity {
                         inadimplencia = inadimplenciaDAO.newInadimplencia(inadimplencia);
                         txt_total.setText("R$ Total");
                         txt_total.setTextColor(Color.BLACK);
-                        txt_inicio.setText(converter.calendarToString(inadimplencia.getDataInicio()).replaceAll("-","/"));
+                        txt_inicio.setText(converter.calendarToString(inadimplencia.getDataInicio()));
                         txt_pagamento.setText("");
-                        Toast.makeText(getApplicationContext(),"Inadimplência quitada com sucesso!",Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getApplicationContext(),"Inadimplência reiniciada com sucesso!",Toast.LENGTH_SHORT).show();
                     }
 
                 })
@@ -286,13 +298,22 @@ public class ActivityInadimplencia extends AppCompatActivity {
                 .setPositiveButton("Sim", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        Produto produto = new Produto(0,"Inadimplência",inadimplencia.getTotal(),1);
-                        ProdutoDAO produtoDAO = new ProdutoDAO(ActivityInadimplencia.this);
-                        produtoDAO.addProduto(inadimplencia.getId(), produto);
-                        inadimplenciaDAO.setValorTotal(inadimplencia);
-                        Intent intent = new Intent(ActivityInadimplencia.this, ProdutosActivity.class);
-                        intent.putExtra("id", inadimplencia.getId());
-                        startActivity(intent);
+                        if (inadimplencia.getTotal() <= 0 || inadimplencia.isQuitada()){
+                            inadimplenciaDAO.deleteInadimplencia(inadimplencia);
+                            Calendar calendar = Calendar.getInstance();
+                            inadimplencia = new Inadimplencia(0,calendar,null,cliente, false, 0);
+                            inadimplencia = inadimplenciaDAO.newInadimplencia(inadimplencia);
+                            Intent intent = new Intent(ActivityInadimplencia.this, ProdutosActivity.class);
+                            intent.putExtra("id", inadimplencia.getId());
+                            startActivity(intent);
+                        } else {
+                            Produto produto = new Produto(0,"Inadimplência",inadimplencia.getTotal(),1);
+                            ProdutoDAO produtoDAO = new ProdutoDAO(ActivityInadimplencia.this);
+                            produtoDAO.addProduto(inadimplencia.getId(), produto);
+                            Intent intent = new Intent(ActivityInadimplencia.this, ProdutosActivity.class);
+                            intent.putExtra("id", inadimplencia.getId());
+                            startActivity(intent);
+                        }
                     }
                 })
                 .setNegativeButton("Não", new DialogInterface.OnClickListener() {
@@ -333,11 +354,15 @@ public class ActivityInadimplencia extends AppCompatActivity {
         salvar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                inadimplencia.setDataFim(converter.stringToCalendar(edt_data.getText().toString()));
-                inadimplenciaDAO.setDataPagamentoInadimplencia(inadimplencia);
-                Toast.makeText(getApplicationContext(),"Data salva com sucesso!",Toast.LENGTH_SHORT).show();
-                txt_pagamento.setText(converter.calendarToString(inadimplencia.getDataFim()));
-                dialog.dismiss();
+                if (edt_data.getText().toString().length() == 10){
+                    inadimplencia.setDataFim(converter.stringToCalendar(edt_data.getText().toString()));
+                    inadimplenciaDAO.setDataPagamentoInadimplencia(inadimplencia);
+                    Toast.makeText(getApplicationContext(),"Data salva com sucesso!"+ converter.calendarToString(inadimplencia.getDataFim()),Toast.LENGTH_SHORT).show();
+                    txt_pagamento.setText(edt_data.getText().toString());
+                    dialog.dismiss();
+                } else {
+                    Toast.makeText(getApplicationContext(),"Adicione uma data completa!"+edt_valor.getText().toString().length(),Toast.LENGTH_SHORT).show();
+                }
             }
         });
     }
