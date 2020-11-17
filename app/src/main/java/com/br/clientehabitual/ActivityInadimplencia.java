@@ -4,13 +4,10 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RadioButton;
-import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -27,6 +24,13 @@ import com.br.clientehabitual.util.Conversoes;
 import com.github.rtoshiro.util.format.SimpleMaskFormatter;
 import com.github.rtoshiro.util.format.pattern.MaskPattern;
 import com.github.rtoshiro.util.format.text.MaskTextWatcher;
+import com.google.android.gms.ads.AdListener;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.InterstitialAd;
+import com.google.android.gms.ads.MobileAds;
+import com.google.android.gms.ads.initialization.InitializationStatus;
+import com.google.android.gms.ads.initialization.OnInitializationCompleteListener;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.text.DecimalFormat;
@@ -36,7 +40,6 @@ public class ActivityInadimplencia extends AppCompatActivity {
     private EditText edt_valor, edt_nome, edt_email, edt_data;
     private FloatingActionButton fab_produtos, fab_quitar, fab_edit, fab_nova_inad, fab_expand;
     private TextView edittext_var, txt_inicio, txt_pagamento, txt_nome, txt_total,txt_total_pop;
-    private Button add;
     private Conversoes converter = new Conversoes();
     private Cliente cliente;
     private Inadimplencia inadimplencia;
@@ -44,6 +47,7 @@ public class ActivityInadimplencia extends AppCompatActivity {
     private InadimplenciaDAO inadimplenciaDAO = new InadimplenciaDAO(this);
     private DecimalFormat df = new DecimalFormat("#0.00");
     private Boolean visivel = false;
+    private InterstitialAd interstitialAd;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -57,6 +61,21 @@ public class ActivityInadimplencia extends AppCompatActivity {
 
         txt_nome = findViewById(R.id.cliente_nome);
         txt_nome.setText(cliente.getNome());
+        txt_nome.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                popupAtualizarCliente();
+            }
+        });
+        gerarAdTelaToda();
+
+        MobileAds.initialize(this, new OnInitializationCompleteListener() {
+            @Override
+            public void onInitializationComplete(InitializationStatus initializationStatus) {
+            }
+        });
+        AdView adView = findViewById(R.id.adViewBannerInad);
+        adView.loadAd(new AdRequest.Builder().build());
 
 
         inadimplencia = inadimplenciaDAO.getInadimpleciaCliente(cliente);
@@ -73,10 +92,12 @@ public class ActivityInadimplencia extends AppCompatActivity {
                 txt_pagamento.setText(converter.calendarToString(inadimplencia.getDataFim()));
                 if (inadimplencia.isQuitada()){
                     txt_total.setTextColor(Color.GREEN);
+                    txt_pagamento.setTextColor(Color.GREEN);
                 } else {
                     Calendar calendar = Calendar.getInstance();
                     if (calendar.getTime().after(inadimplencia.getDataFim().getTime())){
                         txt_total.setTextColor(Color.RED);
+                        txt_pagamento.setTextColor(Color.RED);
                     }
                 }
             }
@@ -96,6 +117,9 @@ public class ActivityInadimplencia extends AppCompatActivity {
                 if (edt_valor.getText().toString().trim().length() > 0){
                     if (edt_valor.getText().toString().trim().equals(".")){
                         Toast.makeText(getApplicationContext(),"Insira um valor",Toast.LENGTH_SHORT).show();
+                    } if (inadimplencia.isQuitada() || inadimplencia.getTotal() <= 0){
+                        confirmNovaInadimplencia();
+                        txt_total.setText("R$ "+df.format(inadimplencia.getTotal()));
                     }
                     else if (radioButton_acres.isChecked()){
                         inadimplencia.setTotal(inadimplencia.getTotal() + Float.parseFloat(edt_valor.getText().toString().trim()));
@@ -151,14 +175,6 @@ public class ActivityInadimplencia extends AppCompatActivity {
                 confirmQuitInadimplencia();
             }
         });
-        fab_edit = findViewById(R.id.fab_cliente_edit);
-        fab_edit.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                hideShowMenuFab();
-                popupAtualizarCliente();
-            }
-        });
         fab_expand = findViewById(R.id.fab_menu_expand);
         fab_expand.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -172,13 +188,9 @@ public class ActivityInadimplencia extends AppCompatActivity {
         if (visivel == true){
             fab_expand.setImageResource(R.drawable.ic_add);
             fab_produtos.hide();
-            fab_edit.hide();
             fab_quitar.hide();
             fab_nova_inad.hide();
             visivel = false;
-
-            edittext_var = findViewById(R.id.title_edit_cliente);
-            edittext_var.setVisibility(View.INVISIBLE);
 
             edittext_var = findViewById(R.id.title_quitar);
             edittext_var.setVisibility(View.INVISIBLE);
@@ -191,12 +203,9 @@ public class ActivityInadimplencia extends AppCompatActivity {
         } else{
             fab_expand.setImageResource(R.drawable.ic_close);
             fab_produtos.show();
-            fab_edit.show();
             fab_quitar.show();
             fab_nova_inad.show();
             visivel = true;
-            edittext_var = findViewById(R.id.title_edit_cliente);
-            edittext_var.setVisibility(View.VISIBLE);
 
             edittext_var = findViewById(R.id.title_quitar);
             edittext_var.setVisibility(View.VISIBLE);
@@ -221,9 +230,12 @@ public class ActivityInadimplencia extends AppCompatActivity {
         edt_nome = (EditText)popupClienteView.findViewById(R.id.popupNome);
         edt_email = (EditText)popupClienteView.findViewById(R.id.popupEmail);
 
+        AdView adView = popupClienteView.findViewById(R.id.adViewBannerEdCliente);
+        adView.loadAd(new AdRequest.Builder().build());
+
         edt_nome.setText(cliente.getNome());
         edt_email.setText(cliente.getEmail());
-        Button add = popupClienteView.findViewById(R.id.btnProximo);
+        Button add = popupClienteView.findViewById(R.id.btnSalvar);
         add.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -304,14 +316,14 @@ public class ActivityInadimplencia extends AppCompatActivity {
                             inadimplencia = new Inadimplencia(0,calendar,null,cliente, false, 0);
                             inadimplencia = inadimplenciaDAO.newInadimplencia(inadimplencia);
                             Intent intent = new Intent(ActivityInadimplencia.this, ProdutosActivity.class);
-                            intent.putExtra("id", inadimplencia.getId());
+                            intent.putExtra("id", inadimplencia.getCliente().getId());
                             startActivity(intent);
                         } else {
                             Produto produto = new Produto(0,"Inadimplência",inadimplencia.getTotal(),1);
                             ProdutoDAO produtoDAO = new ProdutoDAO(ActivityInadimplencia.this);
                             produtoDAO.addProduto(inadimplencia.getId(), produto);
                             Intent intent = new Intent(ActivityInadimplencia.this, ProdutosActivity.class);
-                            intent.putExtra("id", inadimplencia.getId());
+                            intent.putExtra("id", inadimplencia.getCliente().getId());
                             startActivity(intent);
                         }
                     }
@@ -334,6 +346,8 @@ public class ActivityInadimplencia extends AppCompatActivity {
         dialog.show();
 
         edt_data = popupDataView.findViewById(R.id.popup_data_edittext);
+        AdView adView = popupDataView.findViewById(R.id.adViewBannerData);
+        adView.loadAd(new AdRequest.Builder().build());
 
         SimpleMaskFormatter maskData = new SimpleMaskFormatter("[0-3][0-9]/[0-1][0-9]/[0-9][0-9][0-9][0-9]");
         MaskPattern maskPattern1 = new MaskPattern("[0-1]");
@@ -363,6 +377,22 @@ public class ActivityInadimplencia extends AppCompatActivity {
                 } else {
                     Toast.makeText(getApplicationContext(),"Adicione uma data completa!"+edt_valor.getText().toString().length(),Toast.LENGTH_SHORT).show();
                 }
+                if (inadimplencia.getDataFim().getTime().before(Calendar.getInstance().getTime())){
+                    txt_pagamento.setTextColor(Color.RED);
+                } else {
+                    txt_pagamento.setTextColor(Color.BLACK);
+                }
+            }
+        });
+    }
+    public void gerarAdTelaToda(){
+        interstitialAd = new InterstitialAd(this);
+        interstitialAd.setAdUnitId("ca-app-pub-3940256099942544/1033173712");
+        interstitialAd.loadAd(new AdRequest.Builder().build());
+        interstitialAd.setAdListener(new AdListener(){
+            @Override
+            public void onAdLoaded() {
+                interstitialAd.show();
             }
         });
     }

@@ -45,6 +45,8 @@ public class InadimplenciaDAO {
                 inadimplencia.setDataFim(converter.stringToCalendar(cursor.getString(2)));
             }
         }
+        db.close();
+        cursor.close();
         return inadimplencia;
     }
     public void setDataPagamentoInadimplencia(Inadimplencia inad){

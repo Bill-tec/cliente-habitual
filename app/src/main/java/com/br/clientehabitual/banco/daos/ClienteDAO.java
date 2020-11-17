@@ -38,8 +38,8 @@ public class ClienteDAO {
                     cursor.getString(1),cursor.getString(2));
             clientes.add(c);
         };
-        cursor.close();
         db.close();
+        cursor.close();
         return clientes;
     }
     public Cliente getClienteId(Cliente cliente){

@@ -51,11 +51,12 @@ public class JobServiceNotification  extends JobService {
             NotificationChannel notificationChannel = new NotificationChannel(NOTIFICATION_CHANNEL_ID, "Notificações de atrazados", NotificationManager.IMPORTANCE_DEFAULT);
 
             // Configure the notification channel.
-            notificationChannel.setDescription("Notificação de pagamentos atrazados");
+            notificationChannel.setDescription("Notificação de pagamentos atrasados");
             notificationChannel.enableLights(true);
             notificationChannel.setLightColor(Color.RED);
             notificationChannel.setVibrationPattern(new long[]{0, 1000, 500, 1000});
             notificationChannel.enableVibration(true);
+            notificationChannel.setImportance(NotificationManager.IMPORTANCE_HIGH);
             notificationManager.createNotificationChannel(notificationChannel);
         }
         DecimalFormat df = new DecimalFormat("#0.00");
@@ -67,8 +68,7 @@ public class JobServiceNotification  extends JobService {
                 .setSmallIcon(R.mipmap.ic_launcher)
                 .setLargeIcon(BitmapFactory.decodeResource(getResources(),R.drawable.cliente_habitual))
                 .setTicker("Cliente Habitual! 'Pagamentos atrasados!'")
-                .setPriority(Notification.PRIORITY_MAX)
-                .setContentTitle("Pagamento atrazado: "+inadimplencia.getCliente().getNome())
+                .setContentTitle("Pagamento atrasado: "+inadimplencia.getCliente().getNome())
                 .setContentIntent(pendingIntent)
                 .setContentText("R$ "+ df.format(inadimplencia.getTotal()).replaceAll(Pattern.quote("."),",")
                         + " Dia "+ conversoes.calendarToString(inadimplencia.getDataFim()));

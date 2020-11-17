@@ -9,6 +9,7 @@
             android:layout_height="wrap_content"
             android:textSize="15sp"
             android:textStyle="bold"
+            android:maxLength="15"
             android:textColor="#000000"
             />
         <TextView

@@ -4,6 +4,13 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     tools:context=".ActivityInadimplencia" android:background="#f8f8ff">
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_edit"
+        android:layout_toLeftOf="@id/cliente_nome"
+        android:layout_alignTop="@id/cliente_nome"
+        android:layout_alignBottom="@id/cliente_nome"/>
     <TextView
         android:id="@+id/cliente_nome"
         android:layout_width="wrap_content"
@@ -101,7 +108,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:src="@drawable/ic_add"
-        android:layout_alignParentBottom="true"
+        android:layout_above="@+id/adViewBannerInad"
         android:layout_alignParentEnd="true"
         android:layout_marginEnd="15dp"
         android:layout_marginBottom="15dp"/>
@@ -129,35 +136,14 @@
         android:gravity="center"
         android:textColor="#000000"
         android:visibility="invisible"/>
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:src="@drawable/ic_edit"
-        android:id="@+id/fab_cliente_edit"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignRight="@+id/fab_quitar"
-        android:layout_above="@id/fab_quitar"
-        app:fabSize="mini"
-        android:visibility="invisible"
-        />
-    <TextView
-        android:id="@+id/title_edit_cliente"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Editar cliente"
-        android:layout_toLeftOf="@+id/fab_cliente_edit"
-        android:layout_alignTop="@id/fab_cliente_edit"
-        android:layout_alignBottom="@id/fab_cliente_edit"
-        android:layout_alignEnd="@id/title_quitar"
-        android:gravity="center"
-        android:textColor="#000000"
-        android:visibility="invisible"/>
+
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fab_produtos"
         android:src="@drawable/ic_book"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignEnd="@id/fab_cliente_edit"
-        android:layout_above="@id/fab_cliente_edit"
+        android:layout_alignEnd="@id/fab_quitar"
+        android:layout_above="@id/fab_quitar"
         app:fabSize="mini"
         android:layout_marginBottom="10dp"
         android:textColor="#000000"
@@ -267,5 +253,16 @@
                 android:text="SEM DATA"/>
         </TableRow>
     </TableLayout>
+    <com.google.android.gms.ads.AdView
+        xmlns:ads="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/adViewBannerInad"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentBottom="true"
+        ads:adSize="BANNER"
+        ads:adUnitId="ca-app-pub-3940256099942544/6300978111">
+    </com.google.android.gms.ads.AdView>
+
 </RelativeLayout>
 

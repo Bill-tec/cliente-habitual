@@ -42,8 +42,8 @@ public class ProdutoDAO{
                     cursor.getFloat(2),cursor.getInt(3));
             produtos.add(p);
         }
-        cursor.close();
         db.close();
+        cursor.close();
         return produtos;
     }
     public void deleteProdutoId(Produto produto){

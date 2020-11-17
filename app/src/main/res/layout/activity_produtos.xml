@@ -84,7 +84,7 @@
         android:shrinkColumns="*"
         android:orientation="horizontal"
         android:background="#000000"
-        android:layout_alignParentBottom="true">
+        android:layout_above="@+id/adViewBannerProdTela">
     <TableRow
         android:background="#000000"
         android:layout_margin="2dp"
@@ -136,14 +136,16 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="QTD"
-            android:textStyle="bold"/>
+            android:textStyle="bold"
+            android:textColor="#000000"/>
         <TextView
             android:id="@+id/lst_produto_nome"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="NOME"
             android:layout_marginLeft="15sp"
-            android:textStyle="bold"/>
+            android:textStyle="bold"
+            android:textColor="#000000"/>
         <TextView
             android:id="@+id/lst_produto_preco_und"
             android:layout_width="wrap_content"
@@ -152,6 +154,7 @@
             android:layout_gravity="center|right"
             android:layout_marginRight="20dp"
             android:textStyle="bold"
+            android:textColor="#000000"
             />
         <TextView
             android:id="@+id/lst_produto_preco_total"
@@ -159,7 +162,8 @@
             android:layout_height="wrap_content"
             android:text="TOTAL"
             android:textStyle="bold"
-            android:layout_marginRight="10dp"/>
+            android:layout_marginRight="10dp"
+            android:textColor="#000000"/>
 
     </GridLayout>
     <com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -237,4 +241,13 @@
         android:gravity="center"
         android:textColor="#000000"
         android:visibility="invisible"/>
+    <com.google.android.gms.ads.AdView
+        xmlns:ads="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/adViewBannerProdTela"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentBottom="true"
+        ads:adSize="BANNER"
+        ads:adUnitId="ca-app-pub-3940256099942544/6300978111"/>
 </RelativeLayout>

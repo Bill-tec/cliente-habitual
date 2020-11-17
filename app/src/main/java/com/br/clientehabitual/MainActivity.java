@@ -1,5 +1,6 @@
 package com.br.clientehabitual;
 
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -23,6 +24,7 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.br.clientehabitual.adapters.ClienteAdapter;
@@ -36,6 +38,13 @@ import com.br.clientehabitual.util.Conversoes;
 import com.github.rtoshiro.util.format.SimpleMaskFormatter;
 import com.github.rtoshiro.util.format.pattern.MaskPattern;
 import com.github.rtoshiro.util.format.text.MaskTextWatcher;
+import com.google.android.gms.ads.AdListener;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.InterstitialAd;
+import com.google.android.gms.ads.MobileAds;
+import com.google.android.gms.ads.initialization.InitializationStatus;
+import com.google.android.gms.ads.initialization.OnInitializationCompleteListener;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.text.DecimalFormat;
@@ -54,11 +63,21 @@ public class MainActivity extends AppCompatActivity {
     private ClienteDAO clienteDAO = new ClienteDAO(this);
     private InadimplenciaDAO inadimplenciaDAO = new InadimplenciaDAO(this);
     private DecimalFormat df = new DecimalFormat("#0.00");
+    private InterstitialAd interstitialAd;
+
+    @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        MobileAds.initialize(this, new OnInitializationCompleteListener() {
+            @Override
+            public void onInitializationComplete(InitializationStatus initializationStatus) {
+            }
+        });
+
         iniciarJobScheduler();
+        gerarAdTelaToda();
 
         gerarListaClientes();
         final FloatingActionButton novaInadimplencia = findViewById(R.id.btn_nova_inadimplencia);
@@ -83,23 +102,26 @@ public class MainActivity extends AppCompatActivity {
         });
 
     }
+    @RequiresApi(api = Build.VERSION_CODES.N)
     public void iniciarJobScheduler(){
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
-            ComponentName componentName = new ComponentName(this, JobServiceNotification.class);
-            PersistableBundle persistableBundle = new PersistableBundle();
-            JobInfo.Builder builder = new JobInfo.Builder(1, componentName)
-                    .setBackoffCriteria(43200000, JobInfo.BACKOFF_POLICY_LINEAR)
-                    .setExtras(persistableBundle)
-                    .setPersisted(true)
-                    .setRequiresCharging(false)
-                    .setRequiresDeviceIdle(false);
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N){
-                builder.setPeriodic(43200000, 43200000);
-            } else {
-                builder.setPeriodic(43200000);
-            }
             JobScheduler jobScheduler = (JobScheduler) getSystemService(Context.JOB_SCHEDULER_SERVICE);
-            jobScheduler.schedule(builder.build());
+            if (jobScheduler.getPendingJob(1) == null){
+                ComponentName componentName = new ComponentName(this, JobServiceNotification.class);
+                PersistableBundle persistableBundle = new PersistableBundle();
+                JobInfo.Builder builder = new JobInfo.Builder(1, componentName)
+                        .setBackoffCriteria(30000, JobInfo.BACKOFF_POLICY_LINEAR)
+                        .setExtras(persistableBundle)
+                        .setPersisted(true)
+                        .setRequiresDeviceIdle(false);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N){
+                    builder.setPeriodic(28800000, 14400000);
+                } else {
+                        builder.setPeriodic(3000);
+                }
+                jobScheduler.schedule(builder.build());
+            }
+
         }
     }
     @Override
@@ -107,6 +129,14 @@ public class MainActivity extends AppCompatActivity {
         super.onResume();
         gerarListaClientes();
     }
+
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    @Override
+    protected void onDestroy() {
+        iniciarJobScheduler();
+        super.onDestroy();
+    }
+
     public void gerarListaClientes(){
         clientes = ordenarAtrazado();
 
@@ -138,7 +168,7 @@ public class MainActivity extends AppCompatActivity {
                         if (clientes.get(position).getEmail().length() < 1){
                             Toast.makeText(getApplicationContext(),"Nenhum E-mail registrado para cobrança, Atualize os dados do cliente ou digite manualmente!",Toast.LENGTH_LONG).show();
                         }
-                            emailConfirm(inadimplencia);
+                            emailConfirm(inadimplencia, intent);
                     } else {
                         startActivity(intent);
                     }
@@ -174,17 +204,22 @@ public class MainActivity extends AppCompatActivity {
         AlertDialog.Builder dialogBuilder;
         final AlertDialog dialog;
         dialogBuilder = new AlertDialog.Builder(this);
-        final  View popupClienteView = getLayoutInflater().inflate(R.layout.popup_cliente,null);
+        final  View popupClienteView = getLayoutInflater().inflate(R.layout.popup_nova_inadimplencia,null);
         dialogBuilder.setView(popupClienteView);
         dialog = dialogBuilder.create();
         dialog.setTitle("Nova Inadimplêcia!");
         dialog.show();
+        AdView adViewPop = popupClienteView.findViewById(R.id.adViewBannerNewInad);
+        adViewPop.loadAd(new AdRequest.Builder().build());
 
         final EditText nome = (EditText)popupClienteView.findViewById(R.id.popupNome);
         final EditText email = (EditText)popupClienteView.findViewById(R.id.popupEmail);
 
-        valorpopup = (EditText)popupClienteView.findViewById(R.id.popup_cliente_valor);
-        dataPagamento = (EditText)popupClienteView.findViewById(R.id.popup_data_pagamento);
+        valorpopup = popupClienteView.findViewById(R.id.popup_cliente_valor);
+        dataPagamento = popupClienteView.findViewById(R.id.popup_data_pagamento);
+
+        final TextView title_pg = popupClienteView.findViewById(R.id.title_pagamento_nova);
+        final TextView title_valor = popupClienteView.findViewById(R.id.title_valor_nova);
 
         final ImageView sifrao = popupClienteView.findViewById(R.id.sifrao);
         final ImageView calendar = popupClienteView.findViewById(R.id.calendar_icon);
@@ -210,6 +245,8 @@ public class MainActivity extends AppCompatActivity {
                     dataPagamento.setVisibility(View.INVISIBLE);
                     sifrao.setVisibility(View.INVISIBLE);
                     calendar.setVisibility(View.INVISIBLE);
+                    title_pg.setVisibility(View.INVISIBLE);
+                    title_valor.setVisibility(View.INVISIBLE);
                     add.setText("PROXIMO");
                     dataPagamento.setText("");
                     valorpopup.setText("");
@@ -219,6 +256,8 @@ public class MainActivity extends AppCompatActivity {
                     dataPagamento.setVisibility(View.VISIBLE);
                     sifrao.setVisibility(View.VISIBLE);
                     calendar.setVisibility(View.VISIBLE);
+                    title_pg.setVisibility(View.VISIBLE);
+                    title_valor.setVisibility(View.VISIBLE);
                     add.setText("SALVAR");
                     dialog.setTitle("Nova Inadimplêcia!");
                 }
@@ -267,7 +306,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
-    public void emailConfirm(final Inadimplencia inadimplencia){
+    public void emailConfirm(final Inadimplencia inadimplencia, final Intent intent){
         AlertDialog dialog = new AlertDialog.Builder(this)
                 .setMessage("Enviar E-mail para: "+inadimplencia.getCliente().getNome()+" ?")
                 .setPositiveButton("Sim", new DialogInterface.OnClickListener() {
@@ -304,8 +343,6 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.dismiss();
-                        Intent intent = new Intent(MainActivity.this, ProdutosActivity.class);
-                        intent.putExtra("id",Long.toString(inadimplencia.getCliente().getId()));
                         startActivity(intent);
                     }
                 }).show();
@@ -353,5 +390,21 @@ public class MainActivity extends AppCompatActivity {
         quitada.clear();
         emDia.clear();
         return organizado;
+    }
+    public void gerarAdTelaToda(){
+        interstitialAd = new InterstitialAd(this);
+        interstitialAd.setAdUnitId("ca-app-pub-3940256099942544/1033173712");
+        interstitialAd.loadAd(new AdRequest.Builder().build());
+        interstitialAd.setAdListener(new AdListener(){
+            @Override
+            public void onAdLoaded() {
+                interstitialAd.show();
+            }
+            @Override
+            public void onAdClosed() {
+                AdView adView = findViewById(R.id.adViewBanner);
+                adView.loadAd(new AdRequest.Builder().build());
+            }
+        });
     }
 }

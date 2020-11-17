@@ -34,6 +34,11 @@ import com.br.clientehabitual.util.Conversoes;
 import com.github.rtoshiro.util.format.SimpleMaskFormatter;
 import com.github.rtoshiro.util.format.pattern.MaskPattern;
 import com.github.rtoshiro.util.format.text.MaskTextWatcher;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.MobileAds;
+import com.google.android.gms.ads.initialization.InitializationStatus;
+import com.google.android.gms.ads.initialization.OnInitializationCompleteListener;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.text.DecimalFormat;
@@ -60,11 +65,20 @@ public class ProdutosActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_produtos);
 
+
         Intent intent = getIntent();
         int id = Integer.parseInt(intent.getStringExtra("id"));
         cliente = new Cliente(id,"","");
         cliente = clienteDAO.getClienteId(cliente);
         setTitle(cliente.getNome());
+
+        MobileAds.initialize(this, new OnInitializationCompleteListener() {
+            @Override
+            public void onInitializationComplete(InitializationStatus initializationStatus) {
+            }
+        });
+        AdView adView = findViewById(R.id.adViewBannerProdTela);
+        adView.loadAd(new AdRequest.Builder().build());
 
         inadimplencia = inadimplenciaDAO.getInadimpleciaCliente(cliente);
         if (inadimplencia != null) {
@@ -402,7 +416,8 @@ public class ProdutosActivity extends AppCompatActivity {
         final TextView total = popupPagamentoView.findViewById(R.id.popup_textview_pagamento_total);
 
         total.setText(df.format(inadimplencia.getTotal()) +"R$");
-
+        AdView adView = popupPagamentoView.findViewById(R.id.adViewBannerDescPop);
+        adView.loadAd(new AdRequest.Builder().build());
 
         final Button descontar = popupPagamentoView.findViewById(R.id.descontar);
         descontar.setOnClickListener(new View.OnClickListener() {

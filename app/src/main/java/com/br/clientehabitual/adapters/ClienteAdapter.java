@@ -69,8 +69,8 @@ public class ClienteAdapter extends ArrayAdapter<Cliente>{
             } else{
                 if (inadimplencia.getTotal() > 0){
                     textViewTotal.setText("R$ "+total);
+                    textViewData.setText(" SEM DATA ");
                 }
-                textViewData.setText("SEM DATA");
             }
         }
         return rowView;
